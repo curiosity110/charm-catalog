@@ -1,9 +1,11 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X, Search } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { CartSheet } from "./CartSheet";
+import { Input } from "@/components/ui/input";
 
 const navigation = [
   { name: "ПОЧЕТНА", href: "/" },
@@ -15,6 +17,33 @@ const navigation = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get("search") || "";
+    setSearchTerm(query);
+  }, [location.search]);
+
+  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = searchTerm.trim();
+    setSearchTerm(trimmed);
+    const basePath = "/products";
+    const target = trimmed ? `${basePath}?search=${encodeURIComponent(trimmed)}` : basePath;
+
+    if (location.pathname + location.search !== target) {
+      navigate(target);
+    } else if (location.pathname !== basePath) {
+      navigate(target);
+    } else {
+      navigate(target, { replace: true });
+    }
+
+    setIsOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -47,9 +76,18 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="hidden sm:flex">
-              <Search className="h-4 w-4" />
-            </Button>
+            <form onSubmit={handleSearch} className="hidden sm:flex items-center relative">
+              <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                type="search"
+                placeholder="Пребарувај производи"
+                className="pl-9 w-56"
+              />
+            </form>
+
+            <CartSheet />
 
             {/* Mobile menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -59,6 +97,18 @@ export function Navbar() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <form onSubmit={handleSearch} className="mt-4 mb-6">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      value={searchTerm}
+                      onChange={(event) => setSearchTerm(event.target.value)}
+                      type="search"
+                      placeholder="Пребарувај производи"
+                      className="pl-9"
+                    />
+                  </div>
+                </form>
                 <div className="flex flex-col space-y-4 mt-8">
                   {navigation.map((item) => (
                     <Link

@@ -20,15 +20,6 @@ export interface Product {
   product_images?: ProductImage[];
 }
 
-export interface Customer {
-  id: string;
-  name: string;
-  phone: string;
-  email?: string;
-  address?: string;
-  created_at: string;
-}
-
 export interface OrderItem {
   id: string;
   order_id: string;
@@ -41,14 +32,16 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
-  customer_id: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email?: string;
+  customer_address?: string;
   status: "new" | "contacted" | "scheduled" | "fulfilled" | "canceled";
   payment_method: string;
   total_cents: number;
   notes?: string;
   created_at: string;
   updated_at: string;
-  customer?: Customer;
   order_items?: OrderItem[];
 }
 
