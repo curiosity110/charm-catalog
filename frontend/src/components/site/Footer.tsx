@@ -5,14 +5,14 @@ const footerLinks = {
     { name: "Почетна", href: "/" },
     { name: "Производи", href: "/products" },
     { name: "За нас", href: "/about" },
-    { name: "Контакт", href: "/contact" }
+    { name: "Контакт", href: "/contact" },
   ],
   additional: [
     { name: "Прашања и одговори", href: "/faq" },
     { name: "Услови за користење", href: "/terms" },
     { name: "Политика на приватност", href: "/privacy" },
-    { name: "Враќање на производи", href: "/returns" }
-  ]
+    { name: "Враќање на производи", href: "/returns" },
+  ],
 };
 
 export function Footer() {
@@ -23,11 +23,11 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="text-2xl font-bold text-primary mb-4 font-[var(--font-script)]">
-              Natural Charm
+              Vita Call
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              Природни решенија за вашето здравје и убавина. Сертифицирани производи 
-              од најквалитетни состојки.
+              Природни решенија за вашето здравје и убавина. Сертифицирани
+              производи од најквалитетни состојки.
             </p>
           </div>
 
@@ -39,7 +39,7 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.useful.map((link) => (
                 <li key={link.name}>
-                  <Link 
+                  <Link
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
@@ -58,7 +58,7 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.additional.map((link) => (
                 <li key={link.name}>
-                  <Link 
+                  <Link
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
@@ -72,7 +72,7 @@ export function Footer() {
 
         <div className="border-t border-border mt-12 pt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Natural Charm. Сите права задржани.
+            © {new Date().getFullYear()} Vita Call. Сите права задржани.
           </p>
         </div>
       </div>

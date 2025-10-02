@@ -32,7 +32,9 @@ export function Navbar() {
     const trimmed = searchTerm.trim();
     setSearchTerm(trimmed);
     const basePath = "/products";
-    const target = trimmed ? `${basePath}?search=${encodeURIComponent(trimmed)}` : basePath;
+    const target = trimmed
+      ? `${basePath}?search=${encodeURIComponent(trimmed)}`
+      : basePath;
 
     if (location.pathname + location.search !== target) {
       navigate(target);
@@ -53,7 +55,7 @@ export function Navbar() {
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2">
               <div className="text-2xl font-bold text-primary font-[var(--font-script)]">
-                Natural Charm
+                Vita Call
               </div>
             </Link>
           </div>
@@ -76,7 +78,10 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            <form onSubmit={handleSearch} className="hidden sm:flex items-center relative">
+            <form
+              onSubmit={handleSearch}
+              className="hidden sm:flex items-center relative"
+            >
               <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <Input
                 value={searchTerm}

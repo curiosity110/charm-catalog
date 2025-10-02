@@ -13,9 +13,12 @@ export default function ContactPage() {
       <main className="flex-1">
         <section className="py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">Контактирајте го тимот на Natural Charm</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+              Контактирајте го тимот на Vita Call
+            </h1>
             <p className="text-lg text-muted-foreground">
-              Имаме отворена комуникација со нашите клиенти. Пополнете ја формата и ќе ви одговориме во рок од 24 часа.
+              Имаме отворена комуникација со нашите клиенти. Пополнете ја
+              формата и ќе ви одговориме во рок од 24 часа.
             </p>
           </div>
         </section>
@@ -24,28 +27,46 @@ export default function ContactPage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-8 md:grid-cols-[2fr,3fr]">
             <Card className="border-border/60">
               <CardContent className="p-6 space-y-4 text-left">
-                <h2 className="text-2xl font-semibold text-foreground">Работно време</h2>
+                <h2 className="text-2xl font-semibold text-foreground">
+                  Работно време
+                </h2>
                 <p className="text-muted-foreground">
-                  Понеделник - Петок: 09:00 - 18:00<br />
+                  Понеделник - Петок: 09:00 - 18:00
+                  <br />
                   Сабота: 10:00 - 14:00
                 </p>
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground">Адреса на шоурум</h3>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Адреса на шоурум
+                  </h3>
                   <p className="text-muted-foreground">
-                    Ул. Природа бр. 123<br />
+                    Ул. Природа бр. 123
+                    <br />
                     1000 Скопје, Македонија
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground">Телефон</h3>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Телефон
+                  </h3>
                   <p>
-                    <a href="tel:+38970123456" className="text-primary hover:text-primary-light">+389 70 123 456</a>
+                    <a
+                      href="tel:+38970123456"
+                      className="text-primary hover:text-primary-light"
+                    >
+                      +389 70 123 456
+                    </a>
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground">Е-пошта</h3>
+                  <h3 className="text-lg font-semibold text-foreground">
+                    Е-пошта
+                  </h3>
                   <p>
-                    <a href="mailto:info@naturalcharm.mk" className="text-primary hover:text-primary-light">
+                    <a
+                      href="mailto:info@naturalcharm.mk"
+                      className="text-primary hover:text-primary-light"
+                    >
                       info@naturalcharm.mk
                     </a>
                   </p>
@@ -58,31 +79,60 @@ export default function ContactPage() {
                 <form className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <label htmlFor="contact-name" className="block text-sm font-medium text-foreground">
+                      <label
+                        htmlFor="contact-name"
+                        className="block text-sm font-medium text-foreground"
+                      >
                         Име и презиме
                       </label>
-                      <Input id="contact-name" placeholder="Вашето име" required />
+                      <Input
+                        id="contact-name"
+                        placeholder="Вашето име"
+                        required
+                      />
                     </div>
                     <div className="space-y-2">
-                      <label htmlFor="contact-email" className="block text-sm font-medium text-foreground">
+                      <label
+                        htmlFor="contact-email"
+                        className="block text-sm font-medium text-foreground"
+                      >
                         Е-пошта
                       </label>
-                      <Input id="contact-email" type="email" placeholder="contact@example.com" required />
+                      <Input
+                        id="contact-email"
+                        type="email"
+                        placeholder="contact@example.com"
+                        required
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="contact-phone" className="block text-sm font-medium text-foreground">
+                    <label
+                      htmlFor="contact-phone"
+                      className="block text-sm font-medium text-foreground"
+                    >
                       Телефон
                     </label>
                     <Input id="contact-phone" placeholder="07X XXX XXX" />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="contact-message" className="block text-sm font-medium text-foreground">
+                    <label
+                      htmlFor="contact-message"
+                      className="block text-sm font-medium text-foreground"
+                    >
                       Порака
                     </label>
-                    <Textarea id="contact-message" rows={5} placeholder="Напишете ја вашата порака" required />
+                    <Textarea
+                      id="contact-message"
+                      rows={5}
+                      placeholder="Напишете ја вашата порака"
+                      required
+                    />
                   </div>
-                  <Button type="submit" className="w-full bg-primary hover:bg-primary-light">
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary hover:bg-primary-light"
+                  >
                     Испрати порака
                   </Button>
                 </form>
