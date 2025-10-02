@@ -1,0 +1,11 @@
+Django>=5.0
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+psycopg[binary]
+gunicorn
+whitenoise
+python-dotenv
+django-jazzmin # admin panel theme
+Pillow # image handling
+
