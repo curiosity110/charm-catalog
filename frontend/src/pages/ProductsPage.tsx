@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Grid, List, ShoppingCart } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,6 @@ import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<(Product & { product_images?: ProductImage[] })[]>([]);
-  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { addItem, openCart } = useCart();
@@ -23,29 +22,29 @@ export default function ProductsPage() {
 
   const searchQuery = useMemo(() => (searchParams.get("search") || "").trim(), [searchParams]);
 
-  const loadProducts = useCallback(
-    async (query: string) => {
-      setLoading(true);
-      try {
-        const catalog = await fetchProducts(query);
-        setProducts(catalog);
-      } catch (error: any) {
-        console.error("Error loading products:", error);
-        toast({
-          title: "Грешка",
-          description: error?.message || "Не можеме да ги вчитаме производите во моментов.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
-    [toast]
-  );
+  const {
+    data: products = [],
+    isLoading,
+    isFetching,
+    error,
+  } = useQuery<(Product & { product_images?: ProductImage[] })[], Error>({
+    queryKey: ["products", searchQuery],
+    queryFn: ({ signal }) => fetchProducts(searchQuery || undefined, signal),
+    keepPreviousData: true,
+    staleTime: 1000 * 30,
+  });
 
   useEffect(() => {
-    loadProducts(searchQuery);
-  }, [loadProducts, searchQuery]);
+    if (!error) {
+      return;
+    }
+
+    toast({
+      title: "Грешка",
+      description: error.message || "Не можеме да ги вчитаме производите во моментов.",
+      variant: "destructive",
+    });
+  }, [error, toast]);
 
   const handleAddToCart = (product: Product) => {
     addItem(product, 1);
@@ -123,7 +122,7 @@ export default function ProductsPage() {
         {/* Results count */}
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">
-            {loading
+            {isLoading
               ? "Се вчитува..."
               : sortedProducts.length
               ? `${sortedProducts.length} производи${searchQuery ? ` за "${searchQuery}"` : ""}`
@@ -134,7 +133,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Products Grid/List */}
-        {loading ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="animate-pulse">
@@ -218,7 +217,7 @@ export default function ProductsPage() {
           </div>
         )}
 
-        {!loading && sortedProducts.length === 0 && (
+        {!isLoading && !isFetching && sortedProducts.length === 0 && (
           <div className="text-center py-12">
             <div className="text-4xl mb-4">🔍</div>
             <h3 className="text-lg font-medium text-foreground mb-2">

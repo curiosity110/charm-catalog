@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,28 +7,18 @@ import { fetchProducts, type Product, type ProductImage } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
 
 export function FeaturedGrid() {
-  const [products, setProducts] = useState<(Product & { product_images?: ProductImage[] })[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: products = [],
+    isLoading,
+    error,
+  } = useQuery<(Product & { product_images?: ProductImage[] })[], Error>({
+    queryKey: ["featured-products"],
+    queryFn: ({ signal }) => fetchProducts(undefined, signal),
+    staleTime: 1000 * 60,
+  });
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const catalog = await fetchProducts();
-        setProducts(catalog.slice(0, 6));
-        setError(null);
-      } catch (error: any) {
-        console.error("Error loading featured products:", error);
-        setError(error?.message || "Не можеме да ги вчитаме препорачаните производи.");
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
-  }, []);
+  const featuredProducts = products.slice(0, 6);
+  const errorMessage = error?.message || (error ? "Не можеме да ги вчитаме препорачаните производи." : null);
 
   return (
     <section className="py-16">
@@ -42,7 +32,7 @@ export function FeaturedGrid() {
           </p>
         </div>
 
-        {loading ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {[...Array(6)].map((_, index) => (
               <Card key={index} className="animate-pulse">
@@ -55,9 +45,9 @@ export function FeaturedGrid() {
               </Card>
             ))}
           </div>
-        ) : products.length ? (
+        ) : featuredProducts.length ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {products.map((product) => {
+            {featuredProducts.map((product) => {
               const currentPrice = product.price_cents;
               const oldPrice = Math.round(product.price_cents * 1.15);
               const primaryImage = product.product_images?.[0]?.url;
@@ -124,9 +114,9 @@ export function FeaturedGrid() {
           </div>
         )}
 
-        {error && (
+        {errorMessage && (
           <div className="text-center text-destructive mb-12">
-            {error}
+            {errorMessage}
           </div>
         )}
 
