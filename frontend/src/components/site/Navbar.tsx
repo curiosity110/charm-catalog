@@ -4,6 +4,7 @@ import { Menu, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { CartSheet } from "./CartSheet";
 
 const navigation = [
   { name: "ПОЧЕТНА", href: "/" },
@@ -50,6 +51,8 @@ export function Navbar() {
             <Button variant="ghost" size="sm" className="hidden sm:flex">
               <Search className="h-4 w-4" />
             </Button>
+
+            <CartSheet />
 
             {/* Mobile menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>

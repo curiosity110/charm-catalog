@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ShoppingCart, Shield, Truck, Phone } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Truck } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,12 +10,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/contexts/CartContext";
 import { fetchProductBySlug, submitOrderRequest, type Product, type ProductImage } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const { toast } = useToast();
+  const { addItem, openCart } = useCart();
   const [product, setProduct] = useState<(Product & { product_images?: ProductImage[] }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -47,8 +49,20 @@ export default function ProductDetailPage() {
       }
 
       setProduct(productData);
-    } catch (error) {
-      console.error('Error loading product:', error);
+      if (!productData) {
+        toast({
+          title: "Производот не е достапен",
+          description: "Производот што го барате не постои или е неактивен.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error loading product:", error);
+      toast({
+        title: "Грешка",
+        description: error?.message || "Не можеме да ги вчитаме деталите за овој производ.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -58,16 +72,24 @@ export default function ProductDetailPage() {
     e.preventDefault();
     if (!product) return;
 
+    if (formData.quantity < 1) {
+      setFormData((prev) => ({ ...prev, quantity: 1 }));
+    }
+
     setSubmitting(true);
     try {
       await submitOrderRequest({
-        productId: product.id,
-        quantity: formData.quantity,
         customerName: formData.customerName,
         customerPhone: formData.customerPhone,
         customerEmail: formData.customerEmail || undefined,
         customerAddress: formData.customerAddress || undefined,
-        notes: formData.notes || undefined
+        notes: formData.notes || undefined,
+        items: [
+          {
+            productId: product.id,
+            quantity: Math.max(1, formData.quantity),
+          },
+        ],
       });
 
       toast({
@@ -88,13 +110,23 @@ export default function ProductDetailPage() {
     } catch (error: any) {
       toast({
         title: "Грешка",
-        description: "Се случи грешка при испраќање на нарачката. Обидете се повторно.",
+        description: error?.message || "Се случи грешка при испраќање на нарачката. Обидете се повторно.",
         variant: "destructive"
       });
-      console.error('Error creating request:', error);
+      console.error("Error creating request:", error);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleAddToCart = () => {
+    if (!product) return;
+    addItem(product, Math.max(1, formData.quantity));
+    toast({
+      title: "Додадено во кошничка",
+      description: `${product.title} е додаден во вашата кошничка.`,
+    });
+    openCart();
   };
 
   if (loading) {
@@ -165,6 +197,17 @@ export default function ProductDetailPage() {
               {product.description && (
                 <p className="text-muted-foreground mb-6">{product.description}</p>
               )}
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <Button className="bg-primary hover:bg-primary-light" onClick={handleAddToCart}>
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  Додади во кошничка
+                </Button>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Truck className="h-4 w-4" />
+                  <span>Брза достава и плаќање при прием.</span>
+                </div>
+              </div>
             </div>
 
             <Card>
@@ -173,24 +216,77 @@ export default function ProductDetailPage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <Input
-                    placeholder="Име и презиме *"
-                    value={formData.customerName}
-                    onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                    required
-                  />
-                  <Input
-                    placeholder="Телефон *"
-                    value={formData.customerPhone}
-                    onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
-                    required
-                  />
-                  <Input
-                    placeholder="Е-пошта"
-                    type="email"
-                    value={formData.customerEmail}
-                    onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="order-name">Име и презиме *</Label>
+                    <Input
+                      id="order-name"
+                      placeholder="Пример: Ана Анастасова"
+                      value={formData.customerName}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, customerName: e.target.value }))}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="order-phone">Телефон *</Label>
+                    <Input
+                      id="order-phone"
+                      placeholder="07X XXX XXX"
+                      value={formData.customerPhone}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, customerPhone: e.target.value }))}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="order-email">Е-пошта</Label>
+                    <Input
+                      id="order-email"
+                      placeholder="optional@example.com"
+                      type="email"
+                      value={formData.customerEmail}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, customerEmail: e.target.value }))}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="order-quantity">Количина</Label>
+                      <Input
+                        id="order-quantity"
+                        type="number"
+                        min={1}
+                        value={formData.quantity}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            quantity: Math.max(1, Number(e.target.value) || 1),
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="order-address">Адреса за достава</Label>
+                      <Input
+                        id="order-address"
+                        placeholder="Ул. Пример бр. 1, Скопје"
+                        value={formData.customerAddress}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, customerAddress: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="order-notes">Забелешка</Label>
+                    <Textarea
+                      id="order-notes"
+                      placeholder="Дополнителни информации за доставата"
+                      rows={3}
+                      value={formData.notes}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
+                    />
+                  </div>
+
                   <Button type="submit" className="w-full" disabled={submitting}>
                     {submitting ? "Се испраќа..." : "Нарачај сега"}
                   </Button>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, Filter, Grid, List } from "lucide-react";
+import { Search, Grid, List, ShoppingCart } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fetchProducts, type Product, type ProductImage } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<(Product & { product_images?: ProductImage[] })[]>([]);
@@ -17,6 +19,8 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const { addItem, openCart } = useCart();
+  const { toast } = useToast();
 
   useEffect(() => {
     loadProducts();
@@ -26,11 +30,25 @@ export default function ProductsPage() {
     try {
       const catalog = await fetchProducts();
       setProducts(catalog);
-    } catch (error) {
-      console.error('Error loading products:', error);
+    } catch (error: any) {
+      console.error("Error loading products:", error);
+      toast({
+        title: "Грешка",
+        description: error?.message || "Не можеме да ги вчитаме производите во моментов.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddToCart = (product: Product) => {
+    addItem(product, 1);
+    toast({
+      title: "Додадено во кошничка",
+      description: `${product.title} е додаден во вашата кошничка.`,
+    });
+    openCart();
   };
 
   const filteredAndSortedProducts = products
@@ -183,10 +201,18 @@ export default function ProductsPage() {
                   </CardContent>
                   
                   <CardFooter className="p-4 pt-0 flex gap-2">
-                    <Button asChild className="flex-1 bg-primary hover:bg-primary-light">
-                      <Link to={`/products/${product.slug}`}>Нарачај</Link>
+                    <Button
+                      className="flex-1 bg-primary hover:bg-primary-light"
+                      onClick={() => handleAddToCart(product)}
+                    >
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Во кошничка
                     </Button>
-                    <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    >
                       <Link to={`/products/${product.slug}`}>Детали</Link>
                     </Button>
                   </CardFooter>
