@@ -10,13 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { supabase, type Product, type ProductImage } from "@/lib/supabase";
+import { fetchProductBySlug, submitOrderRequest, type Product, type ProductImage } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const { toast } = useToast();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<(Product & { product_images?: ProductImage[] }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -36,36 +36,17 @@ export default function ProductDetailPage() {
   }, [slug]);
 
   const loadProduct = async () => {
+    if (!slug) return;
     try {
-      const { data, error } = await supabase
-        .from('products' as any)
-        .select(`
-          *,
-          product_images (
-            id,
-            url,
-            is_primary,
-            sort_order
-          )
-        `)
-        .eq('slug', slug)
-        .eq('active', true)
-        .single();
+      const productData = await fetchProductBySlug(slug);
 
-      if (error) throw error;
-
-      // Sort images
-      if (data?.product_images) {
-        data.product_images.sort((a: any, b: any) => {
-          if (a.is_primary && !b.is_primary) return -1;
-          if (!a.is_primary && b.is_primary) return 1;
-          return a.sort_order - b.sort_order;
-        });
-        
-        setSelectedImage(data.product_images[0]?.url || null);
+      if (productData?.product_images?.length) {
+        setSelectedImage(productData.product_images[0]?.url || null);
+      } else {
+        setSelectedImage(null);
       }
 
-      setProduct(data);
+      setProduct(productData);
     } catch (error) {
       console.error('Error loading product:', error);
     } finally {
@@ -79,47 +60,15 @@ export default function ProductDetailPage() {
 
     setSubmitting(true);
     try {
-      // Create customer
-      const { data: customer, error: customerError } = await (supabase as any)
-        .from('customers')
-        .insert({
-          name: formData.customerName,
-          phone: formData.customerPhone,
-          email: formData.customerEmail || null,
-          address: formData.customerAddress || null
-        })
-        .select()
-        .single();
-
-      if (customerError) throw customerError;
-
-      // Create order
-      const totalCents = product.price_cents * formData.quantity;
-      const { data: order, error: orderError } = await (supabase as any)
-        .from('orders')
-        .insert({
-          customer_id: customer?.id,
-          status: 'new',
-          payment_method: 'cod',
-          total_cents: totalCents,
-          notes: formData.notes || null
-        })
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      // Create order item
-      const { error: itemError } = await (supabase as any)
-        .from('order_items')
-        .insert({
-          order_id: order?.id,
-          product_id: product.id,
-          quantity: formData.quantity,
-          price_cents_at_purchase: product.price_cents
-        });
-
-      if (itemError) throw itemError;
+      await submitOrderRequest({
+        productId: product.id,
+        quantity: formData.quantity,
+        customerName: formData.customerName,
+        customerPhone: formData.customerPhone,
+        customerEmail: formData.customerEmail || undefined,
+        customerAddress: formData.customerAddress || undefined,
+        notes: formData.notes || undefined
+      });
 
       toast({
         title: "Нарачката е успешно испратена!",
