@@ -6,13 +6,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Currency formatting
-export function formatEUR(cents: number): string {
-  return new Intl.NumberFormat('mk-MK', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
+export function formatEUR(amount: number): string {
+  return new Intl.NumberFormat("mk-MK", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(cents / 100);
+  }).format(amount);
 }
 
 // Slug generation

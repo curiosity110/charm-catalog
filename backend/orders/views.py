@@ -14,7 +14,7 @@ class OrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
 
     serializer_class = OrderSerializer
     lookup_field = "pk"
-    queryset = Order.objects.prefetch_related("order_items__product__product_images")
+    queryset = Order.objects.select_related().prefetch_related("order_items__product")
 
     def create(self, request: Request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)

@@ -1,4 +1,4 @@
-import type { Order, Product, ProductImage } from "@/lib/types";
+import type { Order, Product } from "@/lib/types";
 
 const DEFAULT_API_BASE_URL = "http://localhost:8000";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
@@ -25,18 +25,15 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return data as T;
 }
 
-export async function fetchProducts(
-  search?: string,
-  signal?: AbortSignal
-): Promise<(Product & { product_images?: ProductImage[] })[]> {
+export async function fetchProducts(search?: string, signal?: AbortSignal): Promise<Product[]> {
   const query = search ? `?search=${encodeURIComponent(search)}` : "";
-  return request<(Product & { product_images?: ProductImage[] })[]>(`/api/products${query}`, { signal });
+  return request<Product[]>(`/api/products${query}`, { signal });
 }
 
 export async function fetchProductBySlug(
   slug: string,
   signal?: AbortSignal
-): Promise<(Product & { product_images?: ProductImage[] }) | null> {
+): Promise<Product | null> {
   const response = await fetch(`${API_BASE_URL}/api/products/${slug}`, { signal });
 
   if (response.status === 404) {
@@ -49,7 +46,7 @@ export async function fetchProductBySlug(
     throw new Error(detail || response.statusText);
   }
 
-  const data = (await response.json()) as Product & { product_images?: ProductImage[] };
+  const data = (await response.json()) as Product;
   return data;
 }
 
@@ -86,4 +83,4 @@ export async function submitOrderRequest(payload: OrderRequestPayload): Promise<
   });
 }
 
-export type { Product, ProductImage };
+export type { Product };

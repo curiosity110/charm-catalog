@@ -3,6 +3,9 @@ from __future__ import annotations
 
 import uuid
 
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from catalog.models import Product
@@ -31,7 +34,12 @@ class Order(models.Model):
     customer_address = models.TextField(blank=True)
     payment_method = models.CharField(max_length=50, default="cash_on_delivery")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_NEW)
-    total_cents = models.PositiveIntegerField(default=0)
+    total_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.00"))],
+        default=Decimal("0.00"),
+    )
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -50,7 +58,12 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="order_items", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name="order_items", on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
-    price_cents_at_purchase = models.PositiveIntegerField()
+    price_at_purchase = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.00"))],
+        default=Decimal("0.00"),
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
-import { fetchProductBySlug, submitOrderRequest, type Product, type ProductImage } from "@/lib/api";
+import { fetchProductBySlug, submitOrderRequest, type Product } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
 
 export default function ProductDetailPage() {
@@ -35,7 +35,7 @@ export default function ProductDetailPage() {
     isLoading,
     isFetching,
     error,
-  } = useQuery<(Product & { product_images?: ProductImage[] }) | null, Error>({
+  } = useQuery<Product | null, Error>({
     queryKey: ["product", slug],
     queryFn: ({ signal }) => fetchProductBySlug(slug!, signal),
     enabled: Boolean(slug),
@@ -55,10 +55,11 @@ export default function ProductDetailPage() {
     }
 
     setSelectedImage((current) => {
-      if (current && product.product_images?.some((image) => image?.url === current)) {
+      const availableImages = [product.primary_image_url, product.image, product.image_url].filter(Boolean) as string[];
+      if (current && availableImages.includes(current)) {
         return current;
       }
-      return product.product_images?.[0]?.url || null;
+      return availableImages[0] ?? null;
     });
   }, [product, isLoading, isFetching, slug, error, toast]);
 
@@ -182,8 +183,10 @@ export default function ProductDetailPage() {
     );
   }
 
-  const images = product?.product_images || [];
-  const primaryImage = selectedImage || images[0]?.url;
+  const images = product
+    ? ([product.primary_image_url, product.image, product.image_url].filter(Boolean) as string[])
+    : [];
+  const primaryImage = selectedImage || images[0] || null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -217,7 +220,7 @@ export default function ProductDetailPage() {
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-4">{product.title}</h1>
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-3xl font-bold text-primary">{formatEUR(product.price_cents)}</span>
+                <span className="text-3xl font-bold text-primary">{formatEUR(Number(product.price) || 0)}</span>
                 <Badge variant="secondary">Природно</Badge>
               </div>
               {product.description && (

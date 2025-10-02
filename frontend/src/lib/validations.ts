@@ -3,7 +3,7 @@ import { z } from "zod";
 export const productInputSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
   description: z.string().optional(),
-  price_cents: z.number().min(0, "Price must be positive"),
+  price: z.number().min(0, "Price must be positive"),
   active: z.boolean().default(true),
 });
 
