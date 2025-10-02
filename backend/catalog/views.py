@@ -10,14 +10,20 @@ from .models import Product
 from .serializers import ProductSerializer
 
 
-class ProductViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class ProductViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
     """Provide list/detail/create/update operations for products."""
 
     serializer_class = ProductSerializer
     lookup_field = "slug"
 
     def get_queryset(self):  # type: ignore[override]
-        queryset = Product.objects.prefetch_related("product_images")
+        queryset = Product.objects.all()
         search = self.request.query_params.get("search")
         if search:
             queryset = queryset.filter(Q(title__icontains=search) | Q(description__icontains=search))

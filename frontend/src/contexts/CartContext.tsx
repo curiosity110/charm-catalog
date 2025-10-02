@@ -10,7 +10,7 @@ export interface CartItem {
 interface CartContextValue {
   items: CartItem[];
   itemCount: number;
-  totalCents: number;
+  totalPrice: number;
   addItem: (product: Product, quantity?: number) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -40,7 +40,26 @@ function readStoredCart(): CartItem[] {
       return [];
     }
 
-    return parsed.filter((item) => item?.product?.id && item.quantity > 0);
+    return parsed
+      .filter((item) => item?.product?.id && item.quantity > 0)
+      .map((item) => {
+        const legacyPriceCents = (item as any)?.product?.price_cents;
+        const rawPrice = (item.product as any)?.price;
+        const product = {
+          ...item.product,
+          price:
+            typeof rawPrice === "number"
+              ? rawPrice
+              : typeof rawPrice === "string" && rawPrice.trim() !== ""
+              ? parseFloat(rawPrice)
+              : typeof legacyPriceCents === "number"
+              ? legacyPriceCents / 100
+              : 0,
+          primary_image_url:
+            item.product.primary_image_url || item.product.image || item.product.image_url || "",
+        };
+        return { product, quantity: item.quantity };
+      });
   } catch (error) {
     console.warn("Failed to read cart from storage", error);
     return [];
@@ -96,15 +115,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const openCart = useCallback(() => setIsOpen(true), []);
 
   const totals = useMemo(() => {
-    const totalCents = items.reduce((sum, item) => sum + item.product.price_cents * item.quantity, 0);
+    const totalPrice = items.reduce((sum, item) => sum + (item.product.price || 0) * item.quantity, 0);
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-    return { totalCents, itemCount };
+    return { totalPrice, itemCount };
   }, [items]);
 
   const value = useMemo<CartContextValue>(() => ({
     items,
     itemCount: totals.itemCount,
-    totalCents: totals.totalCents,
+    totalPrice: totals.totalPrice,
     addItem,
     removeItem,
     updateQuantity,
@@ -112,7 +131,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     isOpen,
     setOpen: setIsOpen,
     openCart,
-  }), [items, totals.itemCount, totals.totalCents, addItem, removeItem, updateQuantity, clearCart, isOpen, openCart]);
+  }), [items, totals.itemCount, totals.totalPrice, addItem, removeItem, updateQuantity, clearCart, isOpen, openCart]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

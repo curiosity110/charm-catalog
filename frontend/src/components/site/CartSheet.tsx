@@ -23,7 +23,7 @@ const initialFormState = {
 };
 
 export function CartSheet() {
-  const { items, itemCount, totalCents, removeItem, updateQuantity, clearCart, isOpen, setOpen } = useCart();
+  const { items, itemCount, totalPrice, removeItem, updateQuantity, clearCart, isOpen, setOpen } = useCart();
   const { toast } = useToast();
   const [formData, setFormData] = useState(initialFormState);
   const [submitting, setSubmitting] = useState(false);
@@ -112,7 +112,8 @@ export function CartSheet() {
             <ScrollArea className="h-full pr-4">
               <div className="space-y-4">
                 {items.map((item) => {
-                  const primaryImage = item.product.product_images?.[0]?.url;
+                  const primaryImage =
+                    item.product.primary_image_url || item.product.image || item.product.image_url || null;
                   return (
                     <div key={item.product.id} className="flex gap-4 rounded-lg border border-border/50 p-4">
                       <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
@@ -127,7 +128,7 @@ export function CartSheet() {
                         <div className="flex items-start justify-between gap-2">
                           <div>
                             <p className="font-medium leading-tight text-foreground">{item.product.title}</p>
-                            <p className="text-sm text-muted-foreground">{formatEUR(item.product.price_cents)}</p>
+                            <p className="text-sm text-muted-foreground">{formatEUR(Number(item.product.price) || 0)}</p>
                           </div>
                           <Button
                             variant="ghost"
@@ -163,7 +164,7 @@ export function CartSheet() {
                             </Button>
                           </div>
                           <span className="text-sm font-semibold text-foreground">
-                            {formatEUR(item.product.price_cents * item.quantity)}
+                            {formatEUR((Number(item.product.price) || 0) * item.quantity)}
                           </span>
                         </div>
                       </div>
@@ -179,7 +180,7 @@ export function CartSheet() {
           <div className="border-t border-border/50 pt-4 space-y-4">
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>Вкупно ({itemCount} артикли)</span>
-              <span className="text-lg font-semibold text-primary">{formatEUR(totalCents)}</span>
+              <span className="text-lg font-semibold text-primary">{formatEUR(totalPrice)}</span>
             </div>
 
             <Badge variant="outline" className="w-full justify-center border-primary text-primary bg-primary/5">

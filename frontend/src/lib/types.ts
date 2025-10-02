@@ -1,23 +1,15 @@
-export interface ProductImage {
-  id: string;
-  product_id: string;
-  url: string;
-  storage_path?: string;
-  is_primary: boolean;
-  sort_order: number;
-  created_at: string;
-}
-
 export interface Product {
   id: string;
   title: string;
   slug: string;
   description: string;
-  price_cents: number;
+  price: number;
+  image: string | null;
+  image_url: string;
+  primary_image_url: string;
   active: boolean;
   created_at: string;
   updated_at: string;
-  product_images?: ProductImage[];
 }
 
 export interface OrderItem {
@@ -25,7 +17,7 @@ export interface OrderItem {
   order_id: string;
   product_id: string;
   quantity: number;
-  price_cents_at_purchase: number;
+  price_at_purchase: number;
   created_at: string;
   product?: Product;
 }
@@ -38,7 +30,7 @@ export interface Order {
   customer_address?: string;
   status: "new" | "contacted" | "scheduled" | "fulfilled" | "canceled";
   payment_method: string;
-  total_cents: number;
+  total_price: number;
   notes?: string;
   created_at: string;
   updated_at: string;

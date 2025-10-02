@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { fetchProducts, type Product, type ProductImage } from "@/lib/api";
+import { fetchProducts, type Product } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
@@ -27,7 +27,7 @@ export default function ProductsPage() {
     isLoading,
     isFetching,
     error,
-  } = useQuery<(Product & { product_images?: ProductImage[] })[], Error>({
+  } = useQuery<Product[], Error>({
     queryKey: ["products", searchQuery],
     queryFn: ({ signal }) => fetchProducts(searchQuery || undefined, signal),
     keepPreviousData: true,
@@ -58,10 +58,16 @@ export default function ProductsPage() {
   const sortedProducts = useMemo(() => {
     return [...products].sort((a, b) => {
       switch (sortBy) {
-        case "price-low":
-          return a.price_cents - b.price_cents;
-        case "price-high":
-          return b.price_cents - a.price_cents;
+        case "price-low": {
+          const priceA = Number(a.price) || 0;
+          const priceB = Number(b.price) || 0;
+          return priceA - priceB;
+        }
+        case "price-high": {
+          const priceA = Number(a.price) || 0;
+          const priceB = Number(b.price) || 0;
+          return priceB - priceA;
+        }
         case "name":
           return a.title.localeCompare(b.title);
         default:
@@ -152,7 +158,7 @@ export default function ProductsPage() {
             : "space-y-4"
           }>
             {sortedProducts.map((product) => {
-              const primaryImage = product.product_images?.[0];
+              const primaryImage = product.primary_image_url || product.image || product.image_url || null;
 
               return (
                 <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20">
@@ -160,7 +166,7 @@ export default function ProductsPage() {
                     <div className="w-full h-full bg-gradient-to-br from-primary/5 to-primary-light/10 flex items-center justify-center relative overflow-hidden">
                       {primaryImage ? (
                         <img
-                          src={primaryImage.url}
+                          src={primaryImage}
                           alt={product.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -186,7 +192,7 @@ export default function ProductsPage() {
                     
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-bold text-primary">
-                        {formatEUR(product.price_cents)}
+                        {formatEUR(Number(product.price) || 0)}
                       </span>
                       
                       <Badge variant="secondary" className="text-xs">

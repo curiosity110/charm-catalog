@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { fetchProducts, type Product, type ProductImage } from "@/lib/api";
+import { fetchProducts, type Product } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
 
 export function FeaturedGrid() {
@@ -11,7 +11,7 @@ export function FeaturedGrid() {
     data: products = [],
     isLoading,
     error,
-  } = useQuery<(Product & { product_images?: ProductImage[] })[], Error>({
+  } = useQuery<Product[], Error>({
     queryKey: ["featured-products"],
     queryFn: ({ signal }) => fetchProducts(undefined, signal),
     staleTime: 1000 * 60,
@@ -48,9 +48,10 @@ export function FeaturedGrid() {
         ) : featuredProducts.length ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {featuredProducts.map((product) => {
-              const currentPrice = product.price_cents;
-              const oldPrice = Math.round(product.price_cents * 1.15);
-              const primaryImage = product.product_images?.[0]?.url;
+              const currentPrice = Number(product.price) || 0;
+              const oldPrice = Math.round(currentPrice * 1.15 * 100) / 100;
+              const discount = oldPrice > 0 ? Math.round(((oldPrice - currentPrice) / oldPrice) * 100) : 0;
+              const primaryImage = product.primary_image_url || product.image || product.image_url || null;
 
               return (
                 <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20">
@@ -67,7 +68,7 @@ export function FeaturedGrid() {
                     </div>
 
                     <Badge className="absolute top-3 left-3 bg-destructive hover:bg-destructive/90">
-                      -{Math.round(((oldPrice - currentPrice) / oldPrice) * 100)}%
+                      -{discount}%
                     </Badge>
                   </div>
 
@@ -83,12 +84,8 @@ export function FeaturedGrid() {
                     )}
 
                     <div className="flex items-center space-x-2">
-                      <span className="text-lg font-bold text-primary">
-                        {formatEUR(currentPrice)}
-                      </span>
-                      <span className="text-sm text-muted-foreground line-through">
-                        {formatEUR(oldPrice)}
-                      </span>
+                      <span className="text-lg font-bold text-primary">{formatEUR(currentPrice)}</span>
+                      <span className="text-sm text-muted-foreground line-through">{formatEUR(oldPrice)}</span>
                     </div>
                   </CardContent>
 
