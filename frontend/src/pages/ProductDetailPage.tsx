@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ShoppingCart, Truck } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
@@ -18,8 +19,6 @@ export default function ProductDetailPage() {
   const { slug } = useParams();
   const { toast } = useToast();
   const { addItem, openCart } = useCart();
-  const [product, setProduct] = useState<(Product & { product_images?: ProductImage[] }) | null>(null);
-  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     customerName: "",
@@ -31,42 +30,50 @@ export default function ProductDetailPage() {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  const {
+    data: product,
+    isLoading,
+    isFetching,
+    error,
+  } = useQuery<(Product & { product_images?: ProductImage[] }) | null, Error>({
+    queryKey: ["product", slug],
+    queryFn: ({ signal }) => fetchProductBySlug(slug!, signal),
+    enabled: Boolean(slug),
+    staleTime: 1000 * 60,
+  });
+
   useEffect(() => {
-    if (slug) {
-      loadProduct();
-    }
-  }, [slug]);
-
-  const loadProduct = async () => {
-    if (!slug) return;
-    try {
-      const productData = await fetchProductBySlug(slug);
-
-      if (productData?.product_images?.length) {
-        setSelectedImage(productData.product_images[0]?.url || null);
-      } else {
-        setSelectedImage(null);
-      }
-
-      setProduct(productData);
-      if (!productData) {
+    if (!product) {
+      if (!isLoading && !isFetching && slug && !error) {
         toast({
           title: "Производот не е достапен",
           description: "Производот што го барате не постои или е неактивен.",
           variant: "destructive",
         });
       }
-    } catch (error: any) {
-      console.error("Error loading product:", error);
-      toast({
-        title: "Грешка",
-        description: error?.message || "Не можеме да ги вчитаме деталите за овој производ.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
+
+    setSelectedImage((current) => {
+      if (current && product.product_images?.some((image) => image?.url === current)) {
+        return current;
+      }
+      return product.product_images?.[0]?.url || null;
+    });
+  }, [product, isLoading, isFetching, slug, error, toast]);
+
+  useEffect(() => {
+    if (!error) {
+      return;
+    }
+
+    console.error("Error loading product:", error);
+    toast({
+      title: "Грешка",
+      description: error.message || "Не можеме да ги вчитаме деталите за овој производ.",
+      variant: "destructive",
+    });
+  }, [error, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,7 +136,7 @@ export default function ProductDetailPage() {
     openCart();
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -140,7 +147,26 @@ export default function ProductDetailPage() {
     );
   }
 
-  if (!product) {
+  if (error && !isLoading && !isFetching) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12 space-y-4">
+            <h1 className="text-2xl font-bold text-foreground">Се појави грешка</h1>
+            <p className="text-muted-foreground">
+              {error.message || "Не можеме да ги вчитаме деталите за овој производ во моментов."}
+            </p>
+            <Button asChild>
+              <Link to="/products">Назад кон производи</Link>
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!product && !isFetching && !error) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -156,7 +182,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const images = product.product_images || [];
+  const images = product?.product_images || [];
   const primaryImage = selectedImage || images[0]?.url;
 
   return (

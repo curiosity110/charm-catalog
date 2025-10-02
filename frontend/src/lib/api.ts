@@ -3,7 +3,9 @@ import type { Order, Product, ProductImage } from "@/lib/types";
 const DEFAULT_API_BASE_URL = "http://localhost:8000";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+type RequestOptions = RequestInit & { signal?: AbortSignal };
+
+async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
       "Content-Type": "application/json",
@@ -23,13 +25,19 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return data as T;
 }
 
-export async function fetchProducts(search?: string): Promise<(Product & { product_images?: ProductImage[] })[]> {
+export async function fetchProducts(
+  search?: string,
+  signal?: AbortSignal
+): Promise<(Product & { product_images?: ProductImage[] })[]> {
   const query = search ? `?search=${encodeURIComponent(search)}` : "";
-  return request<(Product & { product_images?: ProductImage[] })[]>(`/api/products${query}`);
+  return request<(Product & { product_images?: ProductImage[] })[]>(`/api/products${query}`, { signal });
 }
 
-export async function fetchProductBySlug(slug: string): Promise<(Product & { product_images?: ProductImage[] }) | null> {
-  const response = await fetch(`${API_BASE_URL}/api/products/${slug}`);
+export async function fetchProductBySlug(
+  slug: string,
+  signal?: AbortSignal
+): Promise<(Product & { product_images?: ProductImage[] }) | null> {
+  const response = await fetch(`${API_BASE_URL}/api/products/${slug}`, { signal });
 
   if (response.status === 404) {
     return null;
