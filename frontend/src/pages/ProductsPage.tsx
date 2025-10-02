@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase, type Product, type ProductImage } from "@/lib/supabase";
+import { fetchProducts, type Product, type ProductImage } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
 
 export default function ProductsPage() {
@@ -24,33 +24,8 @@ export default function ProductsPage() {
 
   const loadProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products' as any)
-        .select(`
-          *,
-          product_images (
-            id,
-            url,
-            is_primary,
-            sort_order
-          )
-        `)
-        .eq('active', true)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Sort images and ensure primary comes first
-      const productsWithSortedImages = (data as any[])?.map((product: any) => ({
-        ...product,
-        product_images: product.product_images?.sort((a: any, b: any) => {
-          if (a.is_primary && !b.is_primary) return -1;
-          if (!a.is_primary && b.is_primary) return 1;
-          return a.sort_order - b.sort_order;
-        })
-      })) || [];
-
-      setProducts(productsWithSortedImages);
+      const catalog = await fetchProducts();
+      setProducts(catalog);
     } catch (error) {
       console.error('Error loading products:', error);
     } finally {
