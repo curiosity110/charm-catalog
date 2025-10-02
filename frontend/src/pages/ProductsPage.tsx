@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Search, Grid, List, ShoppingCart } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Grid, List, ShoppingCart } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,31 +15,37 @@ import { useToast } from "@/hooks/use-toast";
 export default function ProductsPage() {
   const [products, setProducts] = useState<(Product & { product_images?: ProductImage[] })[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { addItem, openCart } = useCart();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+
+  const searchQuery = useMemo(() => (searchParams.get("search") || "").trim(), [searchParams]);
+
+  const loadProducts = useCallback(
+    async (query: string) => {
+      setLoading(true);
+      try {
+        const catalog = await fetchProducts(query);
+        setProducts(catalog);
+      } catch (error: any) {
+        console.error("Error loading products:", error);
+        toast({
+          title: "Грешка",
+          description: error?.message || "Не можеме да ги вчитаме производите во моментов.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast]
+  );
 
   useEffect(() => {
-    loadProducts();
-  }, []);
-
-  const loadProducts = async () => {
-    try {
-      const catalog = await fetchProducts();
-      setProducts(catalog);
-    } catch (error: any) {
-      console.error("Error loading products:", error);
-      toast({
-        title: "Грешка",
-        description: error?.message || "Не можеме да ги вчитаме производите во моментов.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    loadProducts(searchQuery);
+  }, [loadProducts, searchQuery]);
 
   const handleAddToCart = (product: Product) => {
     addItem(product, 1);
@@ -51,12 +56,8 @@ export default function ProductsPage() {
     openCart();
   };
 
-  const filteredAndSortedProducts = products
-    .filter(product =>
-      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .sort((a, b) => {
+  const sortedProducts = useMemo(() => {
+    return [...products].sort((a, b) => {
       switch (sortBy) {
         case "price-low":
           return a.price_cents - b.price_cents;
@@ -64,15 +65,16 @@ export default function ProductsPage() {
           return b.price_cents - a.price_cents;
         case "name":
           return a.title.localeCompare(b.title);
-        default: // newest
+        default:
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
     });
+  }, [products, sortBy]);
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -84,20 +86,8 @@ export default function ProductsPage() {
           </p>
         </div>
 
-        {/* Filters and Search */}
+        {/* Filters */}
         <div className="flex flex-col lg:flex-row gap-4 mb-8 p-6 bg-muted/20 rounded-lg">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Пребарувајте производи..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-full lg:w-48">
               <SelectValue placeholder="Сортирај по" />
@@ -133,7 +123,13 @@ export default function ProductsPage() {
         {/* Results count */}
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">
-            {loading ? "Се вчитува..." : `${filteredAndSortedProducts.length} производи`}
+            {loading
+              ? "Се вчитува..."
+              : sortedProducts.length
+              ? `${sortedProducts.length} производи${searchQuery ? ` за "${searchQuery}"` : ""}`
+              : searchQuery
+              ? `Нема производи за "${searchQuery}"`
+              : "Нема достапни производи"}
           </p>
         </div>
 
@@ -152,13 +148,13 @@ export default function ProductsPage() {
             ))}
           </div>
         ) : (
-          <div className={viewMode === "grid" 
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" 
+          <div className={viewMode === "grid"
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             : "space-y-4"
           }>
-            {filteredAndSortedProducts.map((product) => {
+            {sortedProducts.map((product) => {
               const primaryImage = product.product_images?.[0];
-              
+
               return (
                 <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20">
                   <div className={viewMode === "grid" ? "aspect-[4/3]" : "aspect-[4/3] lg:aspect-[2/1]"}>
@@ -222,14 +218,16 @@ export default function ProductsPage() {
           </div>
         )}
 
-        {!loading && filteredAndSortedProducts.length === 0 && (
+        {!loading && sortedProducts.length === 0 && (
           <div className="text-center py-12">
             <div className="text-4xl mb-4">🔍</div>
             <h3 className="text-lg font-medium text-foreground mb-2">
               Нема најдено производи
             </h3>
             <p className="text-muted-foreground">
-              Пробајте со различен збор за пребарување или филтри.
+              {searchQuery
+                ? "Пробајте со различен збор за пребарување или проверете дали има достапни производи."
+                : "Моментално нема објавени производи. Навратете се повторно."}
             </p>
           </div>
         )}
