@@ -21,6 +21,7 @@ export default function ProductsPage() {
   const [searchParams] = useSearchParams();
 
   const searchQuery = useMemo(() => (searchParams.get("search") || "").trim(), [searchParams]);
+  const normalizedSearchQuery = useMemo(() => searchQuery.toLocaleLowerCase(), [searchQuery]);
 
   const {
     data: products = [],
@@ -28,8 +29,8 @@ export default function ProductsPage() {
     isFetching,
     error,
   } = useQuery<Product[], Error>({
-    queryKey: ["products", searchQuery],
-    queryFn: ({ signal }) => fetchProducts(searchQuery || undefined, signal),
+    queryKey: ["products", normalizedSearchQuery],
+    queryFn: ({ signal }) => fetchProducts(normalizedSearchQuery || undefined, signal),
     keepPreviousData: true,
     staleTime: 1000 * 30,
   });
