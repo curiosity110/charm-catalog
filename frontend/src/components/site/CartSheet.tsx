@@ -4,7 +4,14 @@ import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +30,16 @@ const initialFormState = {
 };
 
 export function CartSheet() {
-  const { items, itemCount, totalPrice, removeItem, updateQuantity, clearCart, isOpen, setOpen } = useCart();
+  const {
+    items,
+    itemCount,
+    totalPrice,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    isOpen,
+    setOpen,
+  } = useCart();
   const { toast } = useToast();
   const [formData, setFormData] = useState(initialFormState);
   const [submitting, setSubmitting] = useState(false);
@@ -46,7 +62,8 @@ export function CartSheet() {
     if (!formData.customerName || !formData.customerPhone) {
       toast({
         title: "Недостасуваат податоци",
-        description: "Внесете ги вашето име и телефон за да ја потврдите нарачката.",
+        description:
+          "Внесете ги вашето име и телефон за да ја потврдите нарачката.",
         variant: "destructive",
       });
       return;
@@ -60,7 +77,10 @@ export function CartSheet() {
         customerEmail: formData.customerEmail || undefined,
         customerAddress: formData.customerAddress || undefined,
         notes: formData.notes || undefined,
-        items: items.map((item) => ({ productId: item.product.id, quantity: item.quantity })),
+        items: items.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+        })),
       });
 
       toast({
@@ -74,7 +94,9 @@ export function CartSheet() {
     } catch (error: any) {
       toast({
         title: "Грешка",
-        description: error?.message || "Не успеавме да ја испратиме вашата нарачка. Обидете се повторно.",
+        description:
+          error?.message ||
+          "Не успеавме да ја испратиме вашата нарачка. Обидете се повторно.",
         variant: "destructive",
       });
     } finally {
@@ -98,7 +120,8 @@ export function CartSheet() {
         <SheetHeader>
           <SheetTitle>Ваша кошничка</SheetTitle>
           <SheetDescription>
-            Плаќањето е при достава. Проверете ги артиклите и потврдете ја нарачката.
+            Плаќањето е при достава. Проверете ги артиклите и потврдете ја
+            нарачката.
           </SheetDescription>
         </SheetHeader>
 
@@ -106,29 +129,47 @@ export function CartSheet() {
           {items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground gap-2">
               <ShoppingCart className="h-10 w-10" />
-              <p>Вашата кошничка е празна. Додајте производи за да продолжите.</p>
+              <p>
+                Вашата кошничка е празна. Додајте производи за да продолжите.
+              </p>
             </div>
           ) : (
             <ScrollArea className="h-full pr-4">
               <div className="space-y-4">
                 {items.map((item) => {
                   const primaryImage =
-                    item.product.primary_image_url || item.product.image || item.product.image_url || null;
+                    item.product.primary_image_url ||
+                    item.product.image ||
+                    item.product.image_url ||
+                    null;
                   return (
-                    <div key={item.product.id} className="flex gap-4 rounded-lg border border-border/50 p-4">
+                    <div
+                      key={item.product.id}
+                      className="flex gap-4 rounded-lg border border-border/50 p-4"
+                    >
                       <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
                         {primaryImage ? (
-                          <img src={primaryImage} alt={item.product.title} className="h-full w-full object-cover" />
+                          <img
+                            src={primaryImage}
+                            alt={item.product.title}
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center text-2xl">🌿</div>
+                          <div className="flex h-full w-full items-center justify-center text-2xl">
+                            🌿
+                          </div>
                         )}
                       </div>
 
                       <div className="flex flex-1 flex-col gap-2">
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <p className="font-medium leading-tight text-foreground">{item.product.title}</p>
-                            <p className="text-sm text-muted-foreground">{formatEUR(Number(item.product.price) || 0)}</p>
+                            <p className="font-medium leading-tight text-foreground">
+                              {item.product.title}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {formatEUR(Number(item.product.price) || 0)}
+                            </p>
                           </div>
                           <Button
                             variant="ghost"
@@ -147,24 +188,32 @@ export function CartSheet() {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => handleQuantityChange(item.product.id, -1)}
+                              onClick={() =>
+                                handleQuantityChange(item.product.id, -1)
+                              }
                               aria-label="Намали количина"
                             >
                               <Minus className="h-3 w-3" />
                             </Button>
-                            <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                            <span className="w-8 text-center text-sm font-medium">
+                              {item.quantity}
+                            </span>
                             <Button
                               variant="outline"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => handleQuantityChange(item.product.id, 1)}
+                              onClick={() =>
+                                handleQuantityChange(item.product.id, 1)
+                              }
                               aria-label="Зголеми количина"
                             >
                               <Plus className="h-3 w-3" />
                             </Button>
                           </div>
                           <span className="text-sm font-semibold text-foreground">
-                            {formatEUR((Number(item.product.price) || 0) * item.quantity)}
+                            {formatEUR(
+                              (Number(item.product.price) || 0) * item.quantity
+                            )}
                           </span>
                         </div>
                       </div>
@@ -180,10 +229,15 @@ export function CartSheet() {
           <div className="border-t border-border/50 pt-4 space-y-4">
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>Вкупно ({itemCount} артикли)</span>
-              <span className="text-lg font-semibold text-primary">{formatEUR(totalPrice)}</span>
+              <span className="text-lg font-semibold text-primary">
+                {formatEUR(totalPrice)}
+              </span>
             </div>
 
-            <Badge variant="outline" className="w-full justify-center border-primary text-primary bg-primary/5">
+            <Badge
+              variant="outline"
+              className="w-full justify-center border-primary text-primary bg-primary/5"
+            >
               Плати при достава
             </Badge>
 
@@ -196,7 +250,12 @@ export function CartSheet() {
                   id="cart-name"
                   placeholder="Пример: Ана Анастасова"
                   value={formData.customerName}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, customerName: event.target.value }))}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      customerName: event.target.value,
+                    }))
+                  }
                   required
                 />
               </div>
@@ -207,7 +266,12 @@ export function CartSheet() {
                   id="cart-phone"
                   placeholder="07X XXX XXX"
                   value={formData.customerPhone}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, customerPhone: event.target.value }))}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      customerPhone: event.target.value,
+                    }))
+                  }
                   required
                 />
               </div>
@@ -219,7 +283,12 @@ export function CartSheet() {
                   type="email"
                   placeholder="optional@example.com"
                   value={formData.customerEmail}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, customerEmail: event.target.value }))}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      customerEmail: event.target.value,
+                    }))
+                  }
                 />
               </div>
 
@@ -229,7 +298,12 @@ export function CartSheet() {
                   id="cart-address"
                   placeholder="Ул. Пример бр. 1, Скопје"
                   value={formData.customerAddress}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, customerAddress: event.target.value }))}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      customerAddress: event.target.value,
+                    }))
+                  }
                 />
               </div>
 
@@ -239,7 +313,12 @@ export function CartSheet() {
                   id="cart-notes"
                   placeholder="Дополнителни информации за доставата"
                   value={formData.notes}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, notes: event.target.value }))}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      notes: event.target.value,
+                    }))
+                  }
                   rows={3}
                 />
               </div>
