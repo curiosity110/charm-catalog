@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400">
+  <defs>
+    <linearGradient id="gradBalm" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#bbf7d0" />
+      <stop offset="100%" stop-color="#4ade80" />
+    </linearGradient>
+  </defs>
+  <rect width="320" height="400" rx="32" fill="#022c22" />
+  <rect x="36" y="48" width="248" height="304" rx="28" fill="url(#gradBalm)" />
+  <g fill="#022c22" font-family="'Poppins', 'Segoe UI', sans-serif">
+    <text x="60" y="120" font-size="34" font-weight="700">Forest</text>
+    <text x="60" y="158" font-size="26" font-weight="600">Breath</text>
+    <text x="60" y="200" font-size="18" opacity="0.8">Билна маст</text>
+    <text x="60" y="226" font-size="16" opacity="0.75">за длабоко дишење.</text>
+  </g>
+  <g fill="#16a34a" opacity="0.5">
+    <path d="M200 260c12-20 24-20 36 0s-12 44-36 44-48-24-36-44 24-20 36 0z" />
+    <path d="M136 300c10-14 20-14 30 0s-10 32-30 32-40-18-30-32 20-14 30 0z" />
+  </g>
+</svg>
