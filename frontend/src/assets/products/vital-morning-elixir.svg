@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400">
+  <defs>
+    <linearGradient id="gradVital" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f97316" />
+      <stop offset="100%" stop-color="#facc15" />
+    </linearGradient>
+  </defs>
+  <rect width="320" height="400" rx="32" fill="#fef3c7" />
+  <rect x="32" y="56" width="256" height="288" rx="28" fill="url(#gradVital)" />
+  <g fill="#431407" font-family="'Poppins', 'Segoe UI', sans-serif">
+    <text x="60" y="120" font-size="32" font-weight="700">Vital Morning</text>
+    <text x="60" y="156" font-size="20">Еликсир за енергија</text>
+    <text x="60" y="200" font-size="16" opacity="0.8">Супер-храна со куркума</text>
+    <text x="60" y="226" font-size="16" opacity="0.8">и ѓумбир.</text>
+  </g>
+  <g opacity="0.4">
+    <circle cx="220" cy="260" r="42" fill="#fff7ed" />
+    <circle cx="120" cy="260" r="32" fill="#fff7ed" />
+  </g>
+</svg>

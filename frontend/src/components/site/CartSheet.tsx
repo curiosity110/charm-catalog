@@ -85,7 +85,7 @@ export function CartSheet() {
 
       toast({
         title: "Нарачката е испратена",
-        description: `Број на барање: ${order.id}. Ќе ве контактираме за потврда.`,
+        description: `Број на барање: ${order.id}. Ви благодариме за довербата! Ќе ве контактираме за потврда.`,
       });
 
       clearCart();
@@ -116,16 +116,21 @@ export function CartSheet() {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="sm:max-w-lg flex flex-col">
-        <SheetHeader>
-          <SheetTitle>Ваша кошничка</SheetTitle>
-          <SheetDescription>
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-xl lg:max-w-2xl flex flex-col gap-4 p-0 sm:p-6"
+      >
+        <SheetHeader className="px-6 pt-6">
+          <SheetTitle className="text-2xl font-semibold tracking-tight">
+            Ваша кошничка
+          </SheetTitle>
+          <SheetDescription className="text-sm leading-relaxed">
             Плаќањето е при достава. Проверете ги артиклите и потврдете ја
             нарачката.
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1 overflow-hidden py-4">
+        <div className="flex-1 overflow-hidden px-0 sm:px-6">
           {items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground gap-2">
               <ShoppingCart className="h-10 w-10" />
@@ -135,7 +140,7 @@ export function CartSheet() {
             </div>
           ) : (
             <ScrollArea className="h-full pr-4">
-              <div className="space-y-4">
+              <div className="space-y-5 pb-2">
                 {items.map((item) => {
                   const primaryImage =
                     item.product.primary_image_url ||
@@ -145,9 +150,9 @@ export function CartSheet() {
                   return (
                     <div
                       key={item.product.id}
-                      className="flex gap-4 rounded-lg border border-border/50 p-4"
+                      className="flex flex-col sm:flex-row gap-4 rounded-xl border border-border/60 bg-background/70 p-4 shadow-sm"
                     >
-                      <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
+                      <div className="h-24 w-full sm:w-28 sm:h-28 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
                         {primaryImage ? (
                           <img
                             src={primaryImage}
@@ -155,20 +160,21 @@ export function CartSheet() {
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center text-2xl">
+                          <div className="flex h-full w-full items-center justify-center text-3xl">
                             🌿
                           </div>
                         )}
                       </div>
 
-                      <div className="flex flex-1 flex-col gap-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-medium leading-tight text-foreground">
+                      <div className="flex flex-1 flex-col gap-3">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                          <div className="space-y-1">
+                            <p className="font-semibold leading-tight text-foreground text-base sm:text-lg">
                               {item.product.title}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              {formatEUR(Number(item.product.price) || 0)}
+                              {formatEUR(Number(item.product.price) || 0)} по
+                              артикл
                             </p>
                           </div>
                           <Button
@@ -182,7 +188,7 @@ export function CartSheet() {
                           </Button>
                         </div>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                           <div className="flex items-center gap-2">
                             <Button
                               variant="outline"
@@ -226,24 +232,24 @@ export function CartSheet() {
         </div>
 
         {items.length > 0 && (
-          <div className="border-t border-border/50 pt-4 space-y-4">
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="border-t border-border/60 bg-muted/20 px-6 py-5 space-y-5">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground">
               <span>Вкупно ({itemCount} артикли)</span>
-              <span className="text-lg font-semibold text-primary">
+              <span className="text-xl font-semibold text-primary">
                 {formatEUR(totalPrice)}
               </span>
             </div>
 
             <Badge
               variant="outline"
-              className="w-full justify-center border-primary text-primary bg-primary/5"
+              className="w-full justify-center border-primary text-primary bg-primary/10 py-2"
             >
-              Плати при достава
+              Плаќање при достава
             </Badge>
 
             <Separator />
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="cart-name">Име и презиме *</Label>
                 <Input
@@ -264,7 +270,7 @@ export function CartSheet() {
                 <Label htmlFor="cart-phone">Телефон *</Label>
                 <Input
                   id="cart-phone"
-                  placeholder="07X XXX XXX"
+                  placeholder="Пример: 070 123 456"
                   value={formData.customerPhone}
                   onChange={(event) =>
                     setFormData((prev) => ({
@@ -324,9 +330,14 @@ export function CartSheet() {
               </div>
 
               <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting ? "Испраќање..." : "Потврди нарачка"}
+                {submitting ? "Се испраќа..." : "Испрати барање за нарачка"}
               </Button>
             </form>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Ви благодариме што ја избирате Charm Catalog. Ќе ве контактираме
+              веднаш по разгледувањето на вашата нарачка.
+            </p>
           </div>
         )}
       </SheetContent>

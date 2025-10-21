@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400">
+  <defs>
+    <linearGradient id="gradTea" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+  </defs>
+  <rect width="320" height="400" rx="32" fill="#e0f2fe" />
+  <rect x="32" y="64" width="256" height="272" rx="32" fill="#fff" />
+  <rect x="56" y="96" width="208" height="208" rx="28" fill="url(#gradTea)" />
+  <g fill="#0f172a" font-family="'Poppins', 'Segoe UI', sans-serif">
+    <text x="70" y="148" font-size="30" font-weight="700">Serene Tea</text>
+    <text x="70" y="188" font-size="20">Урамнотежена мешавина</text>
+    <text x="70" y="214" font-size="20">од камилица и лаванда.</text>
+  </g>
+  <g fill="#bae6fd" opacity="0.6">
+    <circle cx="214" cy="250" r="26" />
+    <circle cx="120" cy="266" r="18" />
+  </g>
+</svg>

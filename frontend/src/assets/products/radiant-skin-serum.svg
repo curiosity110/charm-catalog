@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400">
+  <defs>
+    <linearGradient id="gradSkin" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f472b6" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+  </defs>
+  <rect width="320" height="400" rx="32" fill="#fdf2f8" />
+  <rect x="40" y="48" width="240" height="304" rx="28" fill="url(#gradSkin)" opacity="0.9" />
+  <g fill="#fff7f9" font-family="'Poppins', 'Segoe UI', sans-serif">
+    <text x="60" y="120" font-size="36" font-weight="700">Radiant</text>
+    <text x="60" y="160" font-size="24" font-weight="600">Skin Serum</text>
+    <text x="60" y="202" font-size="16" opacity="0.85">Со хијалуронска киселина</text>
+    <text x="60" y="228" font-size="16" opacity="0.85">и витамин Ц.</text>
+  </g>
+  <g fill="#fdf4ff" opacity="0.6">
+    <circle cx="220" cy="262" r="38" />
+    <circle cx="120" cy="280" r="28" />
+  </g>
+</svg>
