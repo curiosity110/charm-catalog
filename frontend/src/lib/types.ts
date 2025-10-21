@@ -4,6 +4,9 @@ export type Product = {
   slug: string;
   description?: string;
   price: number | string;
+  original_price?: number | string;
+  compare_at_price?: number | string;
+  currency?: string;
   primary_image_url?: string;
   image?: string;
   image_url?: string;
@@ -19,42 +22,47 @@ async function loadMocks(): Promise<Product[]> {
   return mod.mockProducts;
 }
 
+async function queryMocks(search?: string): Promise<Product[]> {
+  const all = await loadMocks();
+  if (!search) return all;
+  const s = search.toLowerCase();
+  return all.filter((p) =>
+    `${p.title ?? ""} ${p.description ?? ""} ${p.slug ?? ""}`.toLowerCase().includes(s)
+  );
+}
+
 export async function fetchProducts(
   search?: string,
   signal?: AbortSignal
 ): Promise<Product[]> {
   if (USE_MOCKS) {
-    const all = await loadMocks();
-    if (!search) return all;
-    const s = search.toLowerCase();
-    return all.filter((p) =>
-      `${p.title ?? ""} ${p.description ?? ""} ${p.slug ?? ""}`
-        .toLowerCase()
-        .includes(s)
-    );
+    return queryMocks(search);
   }
 
   // ---- Real API path (keep your existing code here) ----
   // Example:
   const url = new URL("/api/products", window.location.origin);
   if (search) url.searchParams.set("search", search);
-  const res = await fetch(url.toString(), { signal });
-  if (!res.ok) throw new Error("Грешка при вчитување на производи.");
-  const data: Product[] = await res.json();
 
-  // Fallback: if server returns empty, give mocks (nice for demos)
-  if (!data || data.length === 0) {
-    const all = await loadMocks();
-    if (!search) return all;
-    const s = search.toLowerCase();
-    return all.filter((p) =>
-      `${p.title ?? ""} ${p.description ?? ""} ${p.slug ?? ""}`
-        .toLowerCase()
-        .includes(s)
-    );
+  try {
+    const res = await fetch(url.toString(), { signal });
+    if (!res.ok) {
+      if (res.status === 404) {
+        return queryMocks(search);
+      }
+      throw new Error("Грешка при вчитување на производи.");
+    }
+    const data: Product[] = await res.json();
+
+    if (!data || data.length === 0) {
+      return queryMocks(search);
+    }
+
+    return data;
+  } catch (error) {
+    console.warn("Falling back to mock products", error);
+    return queryMocks(search);
   }
-
-  return data;
 }
 
 export async function fetchProductBySlug(
@@ -69,15 +77,26 @@ export async function fetchProductBySlug(
   // ---- Real API path (keep your existing code here) ----
   // Example:
   const url = new URL(`/api/products/${slug}`, window.location.origin);
-  const res = await fetch(url.toString(), { signal });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error("Грешка при вчитување на производ.");
-  const product: Product = await res.json();
 
-  // If API returns nothing, try mocks as a safety
-  if (!product) {
+  try {
+    const res = await fetch(url.toString(), { signal });
+    if (res.status === 404) {
+      const all = await loadMocks();
+      return all.find((p) => p.slug === slug) ?? null;
+    }
+    if (!res.ok) {
+      throw new Error("Грешка при вчитување на производ.");
+    }
+    const product: Product | null = await res.json();
+
+    if (!product) {
+      const all = await loadMocks();
+      return all.find((p) => p.slug === slug) ?? null;
+    }
+    return product;
+  } catch (error) {
+    console.warn("Falling back to mock product", error);
     const all = await loadMocks();
     return all.find((p) => p.slug === slug) ?? null;
   }
-  return product;
 }

@@ -9,7 +9,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fetchProducts, type Product } from "@/lib/api";
-import { formatEUR } from "@/lib/utils";
+import { formatMKD } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -141,7 +141,7 @@ export default function ProductsPage() {
 
         {/* Products Grid/List */}
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="animate-pulse">
                 <div className="aspect-[4/3] bg-muted"></div>
@@ -154,66 +154,92 @@ export default function ProductsPage() {
             ))}
           </div>
         ) : (
-          <div className={viewMode === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            : "space-y-4"
-          }>
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+                : "space-y-6"
+            }
+          >
             {sortedProducts.map((product) => {
               const primaryImage = product.primary_image_url || product.image || product.image_url || null;
+              const originalPriceRaw =
+                (product as { original_price?: number | string }).original_price ??
+                (product as { compare_at_price?: number | string }).compare_at_price ??
+                null;
+              const originalPrice = Number(originalPriceRaw) || 0;
+              const productPrice = Number(product.price) || 2400;
+              const hasDiscount = originalPrice > productPrice;
+              const discountPercentage = hasDiscount
+                ? Math.round(((originalPrice - productPrice) / originalPrice) * 100)
+                : 0;
 
               return (
-                <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20">
-                  <div className={viewMode === "grid" ? "aspect-[4/3]" : "aspect-[4/3] lg:aspect-[2/1]"}>
-                    <div className="w-full h-full bg-gradient-to-br from-primary/5 to-primary-light/10 flex items-center justify-center relative overflow-hidden">
+                <Card
+                  key={product.id}
+                  className="group flex h-full flex-col overflow-hidden border-border/40 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/30"
+                >
+                  <div className={viewMode === "grid" ? "aspect-[4/3]" : "aspect-[4/3] lg:aspect-[3/2]"}>
+                    <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-primary/5 via-primary-light/5 to-primary-light/20">
                       {primaryImage ? (
                         <img
                           src={primaryImage}
                           alt={product.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="text-center">
-                          <div className="text-4xl mb-2">🌿</div>
-                          <p className="text-xs text-muted-foreground">Слика на производ</p>
+                        <div className="text-center text-muted-foreground">
+                          <div className="mb-2 text-4xl">🌿</div>
+                          <p className="text-xs">Слика на производ</p>
                         </div>
+                      )}
+                      {hasDiscount && (
+                        <Badge className="absolute left-4 top-4 bg-destructive text-destructive-foreground shadow-lg">
+                          -{discountPercentage}%
+                        </Badge>
                       )}
                     </div>
                   </div>
-                  
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+
+                  <CardContent className="flex flex-1 flex-col gap-4 p-5">
+                    <h3 className="line-clamp-2 text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
                       {product.title}
                     </h3>
-                    
+
                     {product.description && (
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
                         {product.description}
                       </p>
                     )}
-                    
+
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-primary">
-                        {formatEUR(Number(product.price) || 0)}
-                      </span>
-                      
-                      <Badge variant="secondary" className="text-xs">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xl font-bold text-primary">{formatMKD(productPrice)}</span>
+                        {hasDiscount && (
+                          <span className="text-sm text-muted-foreground line-through">
+                            {formatMKD(originalPrice)}
+                          </span>
+                        )}
+                      </div>
+
+                      <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs uppercase tracking-wide">
                         Природно
                       </Badge>
                     </div>
                   </CardContent>
-                  
-                  <CardFooter className="p-4 pt-0 flex gap-2">
+
+                  <CardFooter className="flex flex-col gap-3 p-5 pt-0 md:flex-row">
                     <Button
-                      className="flex-1 bg-primary hover:bg-primary-light"
+                      className="w-full flex-1 gap-2 bg-primary hover:bg-primary-light"
                       onClick={() => handleAddToCart(product)}
                     >
-                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      <ShoppingCart className="h-4 w-4" />
                       Во кошничка
                     </Button>
                     <Button
                       asChild
                       variant="outline"
-                      className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      className="w-full flex-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                     >
                       <Link to={`/products/${product.slug}`}>Детали</Link>
                     </Button>

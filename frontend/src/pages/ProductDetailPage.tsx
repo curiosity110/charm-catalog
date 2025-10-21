@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { fetchProductBySlug, submitOrderRequest, type Product } from "@/lib/api";
-import { formatEUR } from "@/lib/utils";
+import { formatMKD } from "@/lib/utils";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -187,6 +187,13 @@ export default function ProductDetailPage() {
     ? ([product.primary_image_url, product.image, product.image_url].filter(Boolean) as string[])
     : [];
   const primaryImage = selectedImage || images[0] || null;
+  const originalPriceRaw =
+    (product as { original_price?: number | string } | null)?.original_price ??
+    (product as { compare_at_price?: number | string } | null)?.compare_at_price ??
+    null;
+  const originalPrice = Number(originalPriceRaw) || 0;
+  const productPrice = Number(product?.price) || 2400;
+  const hasDiscount = originalPrice > productPrice;
 
   return (
     <div className="min-h-screen bg-background">
@@ -219,9 +226,23 @@ export default function ProductDetailPage() {
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-4">{product.title}</h1>
-              <div className="flex items-center gap-4 mb-4">
-                <span className="text-3xl font-bold text-primary">{formatEUR(Number(product.price) || 0)}</span>
-                <Badge variant="secondary">Природно</Badge>
+              <div className="flex flex-wrap items-center gap-4 mb-4">
+                <div className="flex flex-col">
+                  <span className="text-4xl font-bold text-primary">{formatMKD(productPrice)}</span>
+                  {hasDiscount && (
+                    <span className="text-lg text-muted-foreground line-through">
+                      {formatMKD(originalPrice)}
+                    </span>
+                  )}
+                </div>
+                <Badge variant="secondary" className="rounded-full px-3 py-1 uppercase tracking-wide">
+                  Природно
+                </Badge>
+                {hasDiscount && (
+                  <Badge className="bg-destructive text-destructive-foreground">
+                    Заштедете {formatMKD(originalPrice - productPrice)}
+                  </Badge>
+                )}
               </div>
               {product.description && (
                 <p className="text-muted-foreground mb-6">{product.description}</p>
