@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { submitOrderRequest } from "@/lib/api";
-import { formatEUR } from "@/lib/utils";
+import { formatMKD } from "@/lib/utils";
 
 const initialFormState = {
   customerName: "",
@@ -85,87 +85,123 @@ export function CartSheet() {
   return (
     <Sheet open={isOpen} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="relative">
+        <Button variant="default" size="sm" className="relative gap-2 px-4">
           <ShoppingCart className="h-4 w-4" />
+          <span className="hidden font-semibold sm:inline-block">Кошничка</span>
           {itemCount > 0 && (
-            <span className="absolute -top-2 -right-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground px-1">
+            <span className="absolute -top-2 -right-2 inline-flex h-5 min-w-[22px] items-center justify-center rounded-full bg-destructive px-1 text-[11px] font-semibold text-destructive-foreground shadow">
               {itemCount}
             </span>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="sm:max-w-lg flex flex-col">
-        <SheetHeader>
-          <SheetTitle>Ваша кошничка</SheetTitle>
-          <SheetDescription>
-            Плаќањето е при достава. Проверете ги артиклите и потврдете ја нарачката.
-          </SheetDescription>
-        </SheetHeader>
+      <SheetContent
+        side="right"
+        className="flex h-full flex-col bg-gradient-to-br from-background via-background to-primary/10 p-0 sm:max-w-xl md:max-w-2xl"
+      >
+        <div className="border-b border-border/40 bg-primary/5 p-6">
+          <SheetHeader className="text-left">
+            <SheetTitle className="text-2xl font-bold">Ваша кошничка</SheetTitle>
+            <SheetDescription className="max-w-lg">
+              Плаќањето е при достава. Проверете ги артиклите и потврдете ја нарачката.
+            </SheetDescription>
+          </SheetHeader>
+          {itemCount > 0 && (
+            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+              <Badge variant="outline" className="border-primary/50 bg-primary/10 text-primary">
+                {itemCount} артикли
+              </Badge>
+              <span>
+                Вкупно: <span className="font-semibold text-foreground">{formatMKD(totalPrice)}</span>
+              </span>
+            </div>
+          )}
+        </div>
 
-        <div className="flex-1 overflow-hidden py-4">
+        <div className="flex-1 overflow-hidden p-6">
           {items.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground gap-2">
+            <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-muted-foreground">
               <ShoppingCart className="h-10 w-10" />
               <p>Вашата кошничка е празна. Додајте производи за да продолжите.</p>
             </div>
           ) : (
             <ScrollArea className="h-full pr-4">
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {items.map((item) => {
                   const primaryImage =
                     item.product.primary_image_url || item.product.image || item.product.image_url || null;
+                  const originalPriceRaw =
+                    (item.product as { original_price?: number | string }).original_price ??
+                    (item.product as { compare_at_price?: number | string }).compare_at_price ??
+                    null;
+                  const originalPrice = Number(originalPriceRaw) || 0;
+                  const itemPrice = Number(item.product.price) || 2400;
+                  const hasDiscount = originalPrice > itemPrice;
                   return (
-                    <div key={item.product.id} className="flex gap-4 rounded-lg border border-border/50 p-4">
-                      <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
-                        {primaryImage ? (
-                          <img src={primaryImage} alt={item.product.title} className="h-full w-full object-cover" />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center text-2xl">🌿</div>
-                        )}
-                      </div>
-
-                      <div className="flex flex-1 flex-col gap-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-medium leading-tight text-foreground">{item.product.title}</p>
-                            <p className="text-sm text-muted-foreground">{formatEUR(Number(item.product.price) || 0)}</p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                            onClick={() => removeItem(item.product.id)}
-                            aria-label="Отстрани"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                    <div
+                      key={item.product.id}
+                      className="flex flex-col gap-4 rounded-xl border border-border/50 bg-background/80 p-4 shadow-sm backdrop-blur"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
+                          {primaryImage ? (
+                            <img src={primaryImage} alt={item.product.title} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-2xl">🌿</div>
+                          )}
                         </div>
 
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
+                        <div className="flex-1 space-y-3">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="space-y-1">
+                              <p className="font-semibold leading-tight text-foreground">{item.product.title}</p>
+                              {item.product.description && (
+                                <p className="text-xs text-muted-foreground line-clamp-2">{item.product.description}</p>
+                              )}
+                            </div>
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleQuantityChange(item.product.id, -1)}
-                              aria-label="Намали количина"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              onClick={() => removeItem(item.product.id)}
+                              aria-label="Отстрани"
                             >
-                              <Minus className="h-3 w-3" />
-                            </Button>
-                            <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleQuantityChange(item.product.id, 1)}
-                              aria-label="Зголеми количина"
-                            >
-                              <Plus className="h-3 w-3" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
-                          <span className="text-sm font-semibold text-foreground">
-                            {formatEUR((Number(item.product.price) || 0) * item.quantity)}
-                          </span>
+
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-9 w-9"
+                                onClick={() => handleQuantityChange(item.product.id, -1)}
+                                aria-label="Намали количина"
+                              >
+                                <Minus className="h-3 w-3" />
+                              </Button>
+                              <span className="w-10 text-center text-base font-medium">{item.quantity}</span>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-9 w-9"
+                                onClick={() => handleQuantityChange(item.product.id, 1)}
+                                aria-label="Зголеми количина"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
+
+                            <div className="text-right text-sm text-foreground">
+                              <p className="text-lg font-semibold">{formatMKD(itemPrice * item.quantity)}</p>
+                              {hasDiscount && (
+                                <span className="text-xs text-muted-foreground line-through">
+                                  {formatMKD(originalPrice * item.quantity)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -177,19 +213,19 @@ export function CartSheet() {
         </div>
 
         {items.length > 0 && (
-          <div className="border-t border-border/50 pt-4 space-y-4">
+          <div className="space-y-5 border-t border-border/40 bg-background/95 p-6 shadow-inner">
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>Вкупно ({itemCount} артикли)</span>
-              <span className="text-lg font-semibold text-primary">{formatEUR(totalPrice)}</span>
+              <span className="text-xl font-semibold text-primary">{formatMKD(totalPrice)}</span>
             </div>
 
-            <Badge variant="outline" className="w-full justify-center border-primary text-primary bg-primary/5">
+            <Badge variant="outline" className="w-full justify-center border-primary/60 bg-primary/10 text-primary">
               Плати при достава
             </Badge>
 
             <Separator />
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="cart-name">Име и презиме *</Label>
                 <Input
@@ -244,7 +280,7 @@ export function CartSheet() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={submitting}>
+              <Button type="submit" className="h-12 w-full text-base font-semibold" disabled={submitting}>
                 {submitting ? "Испраќање..." : "Потврди нарачка"}
               </Button>
             </form>

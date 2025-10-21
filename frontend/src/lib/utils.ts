@@ -5,13 +5,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Currency formatting
-export function formatEUR(amount: number): string {
+// Currency formatting (Macedonian Denar)
+export function formatMKD(amount: number): string {
   return new Intl.NumberFormat("mk-MK", {
     style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    currency: "MKD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(amount);
 }
 
