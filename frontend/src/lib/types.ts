@@ -15,8 +15,8 @@ const USE_MOCKS = import.meta.env?.VITE_USE_MOCK_PRODUCTS === "true";
 
 // Lazy import so tree-shaking works nicely
 async function loadMocks(): Promise<Product[]> {
-  const mod = await import("@/assets/products/mockProducts");
-  return mod.mockProducts;
+  const mod = await import("@/data/staticProducts");
+  return mod.staticProducts;
 }
 
 export async function fetchProducts(

@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ShoppingCart, Truck } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
@@ -12,8 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
-import { fetchProductBySlug, submitOrderRequest, type Product } from "@/lib/api";
+import { submitOrderRequest } from "@/lib/api";
+import type { Product } from "@/lib/types";
 import { formatEUR } from "@/lib/utils";
+import { findProductBySlug } from "@/data/staticProducts";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -30,27 +31,23 @@ export default function ProductDetailPage() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const {
-    data: product,
-    isLoading,
-    isFetching,
-    error,
-  } = useQuery<Product | null, Error>({
-    queryKey: ["product", slug],
-    queryFn: ({ signal }) => fetchProductBySlug(slug!, signal),
-    enabled: Boolean(slug),
-    staleTime: 1000 * 60,
-  });
+  const product = useMemo<Product | null>(() => {
+    if (!slug) {
+      return null;
+    }
+    return findProductBySlug(slug) ?? null;
+  }, [slug]);
 
   useEffect(() => {
     if (!product) {
-      if (!isLoading && !isFetching && slug && !error) {
+      if (slug) {
         toast({
           title: "Производот не е достапен",
           description: "Производот што го барате не постои или е неактивен.",
           variant: "destructive",
         });
       }
+      setSelectedImage(null);
       return;
     }
 
@@ -61,20 +58,7 @@ export default function ProductDetailPage() {
       }
       return availableImages[0] ?? null;
     });
-  }, [product, isLoading, isFetching, slug, error, toast]);
-
-  useEffect(() => {
-    if (!error) {
-      return;
-    }
-
-    console.error("Error loading product:", error);
-    toast({
-      title: "Грешка",
-      description: error.message || "Не можеме да ги вчитаме деталите за овој производ.",
-      variant: "destructive",
-    });
-  }, [error, toast]);
+  }, [product, slug, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,37 +121,7 @@ export default function ProductDetailPage() {
     openCart();
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">Loading...</div>
-        </main>
-      </div>
-    );
-  }
-
-  if (error && !isLoading && !isFetching) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12 space-y-4">
-            <h1 className="text-2xl font-bold text-foreground">Се појави грешка</h1>
-            <p className="text-muted-foreground">
-              {error.message || "Не можеме да ги вчитаме деталите за овој производ во моментов."}
-            </p>
-            <Button asChild>
-              <Link to="/products">Назад кон производи</Link>
-            </Button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  if (!product && !isFetching && !error) {
+  if (!product) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />

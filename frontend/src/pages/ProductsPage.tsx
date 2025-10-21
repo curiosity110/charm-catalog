@@ -1,17 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Grid, List, ShoppingCart } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { fetchProducts, type Product } from "@/lib/api";
+import type { Product } from "@/lib/types";
 import { formatEUR } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { searchProducts } from "@/data/staticProducts";
 
 export default function ProductsPage() {
   const [sortBy, setSortBy] = useState("newest");
@@ -21,31 +21,7 @@ export default function ProductsPage() {
   const [searchParams] = useSearchParams();
 
   const searchQuery = useMemo(() => (searchParams.get("search") || "").trim(), [searchParams]);
-  const normalizedSearchQuery = useMemo(() => searchQuery.toLocaleLowerCase(), [searchQuery]);
-
-  const {
-    data: products = [],
-    isLoading,
-    isFetching,
-    error,
-  } = useQuery<Product[], Error>({
-    queryKey: ["products", normalizedSearchQuery],
-    queryFn: ({ signal }) => fetchProducts(normalizedSearchQuery || undefined, signal),
-    keepPreviousData: true,
-    staleTime: 1000 * 30,
-  });
-
-  useEffect(() => {
-    if (!error) {
-      return;
-    }
-
-    toast({
-      title: "Грешка",
-      description: error.message || "Не можеме да ги вчитаме производите во моментов.",
-      variant: "destructive",
-    });
-  }, [error, toast]);
+  const products = useMemo<Product[]>(() => searchProducts(searchQuery), [searchQuery]);
 
   const handleAddToCart = (product: Product) => {
     addItem(product, 1);
@@ -129,9 +105,7 @@ export default function ProductsPage() {
         {/* Results count */}
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">
-            {isLoading
-              ? "Се вчитува..."
-              : sortedProducts.length
+            {sortedProducts.length
               ? `${sortedProducts.length} производи${searchQuery ? ` за "${searchQuery}"` : ""}`
               : searchQuery
               ? `Нема производи за "${searchQuery}"`
@@ -140,25 +114,14 @@ export default function ProductsPage() {
         </div>
 
         {/* Products Grid/List */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <div className="aspect-[4/3] bg-muted"></div>
-                <CardContent className="p-4">
-                  <div className="h-4 bg-muted rounded mb-2"></div>
-                  <div className="h-3 bg-muted rounded mb-3 w-3/4"></div>
-                  <div className="h-4 bg-muted rounded w-1/2"></div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className={viewMode === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            : "space-y-4"
-          }>
-            {sortedProducts.map((product) => {
+        <div
+          className={
+            viewMode === "grid"
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              : "space-y-4"
+          }
+        >
+          {sortedProducts.map((product) => {
               const primaryImage = product.primary_image_url || product.image || product.image_url || null;
 
               return (
@@ -220,11 +183,10 @@ export default function ProductsPage() {
                   </CardFooter>
                 </Card>
               );
-            })}
-          </div>
-        )}
+          })}
+        </div>
 
-        {!isLoading && !isFetching && sortedProducts.length === 0 && (
+        {sortedProducts.length === 0 && (
           <div className="text-center py-12">
             <div className="text-4xl mb-4">🔍</div>
             <h3 className="text-lg font-medium text-foreground mb-2">

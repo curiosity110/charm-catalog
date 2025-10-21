@@ -1,19 +1,15 @@
-// src/assets/products/mockProducts.ts
-import type { Product } from "@/lib/api";
+import type { Product } from "@/lib/types";
 
-// Import images so Vite resolves URLs correctly
-import imgArthro from "./ArhroVita.jpeg";
-import imgCardi from "./CardiVita.jpeg";
-import imgDia from "./DiaVita.jpeg";
-import imgOpti from "./OptiVita.jpeg";
-import imgPro from "./ProVita.jpeg";
-import imgVitaFit from "./VitaFit.jpeg";
-import imgStallion from "./Stallion Power.jpeg";
+import imgArthro from "@/assets/products/ArhroVita.jpeg";
+import imgCardi from "@/assets/products/CardiVita.jpeg";
+import imgDia from "@/assets/products/DiaVita.jpeg";
+import imgOpti from "@/assets/products/OptiVita.jpeg";
+import imgPro from "@/assets/products/ProVita.jpeg";
 
 const now = new Date();
-const daysAgo = (n: number) => new Date(now.getTime() - n * 86400000).toISOString();
+const daysAgo = (n: number) => new Date(now.getTime() - n * 86_400_000).toISOString();
 
-export const mockProducts: Product[] = [
+export const staticProducts: Product[] = [
   {
     id: "arthrovita",
     title: "ArthroVita – Поддршка за зглобови",
@@ -32,7 +28,7 @@ export const mockProducts: Product[] = [
       "Поддршка за кардиоваскуларно здравје со CoQ10, магнезиум и Б-витамини.",
     price: 21.9,
     primary_image_url: imgCardi,
-    created_at: daysAgo(1),
+    created_at: daysAgo(5),
   },
   {
     id: "diavita",
@@ -42,7 +38,7 @@ export const mockProducts: Product[] = [
       "Билна поддршка за нормални нивоа на гликоза со цимет и берберин.",
     price: 22.5,
     primary_image_url: imgDia,
-    created_at: daysAgo(4),
+    created_at: daysAgo(8),
   },
   {
     id: "optivita",
@@ -52,7 +48,7 @@ export const mockProducts: Product[] = [
       "Лутеин, зеаксантин и боровинка за заштита и удобност на очите.",
     price: 19.9,
     primary_image_url: imgOpti,
-    created_at: daysAgo(7),
+    created_at: daysAgo(11),
   },
   {
     id: "provita",
@@ -62,26 +58,27 @@ export const mockProducts: Product[] = [
       "Цинк, витамин C и D3 за дневна одбрана и енергија.",
     price: 17.9,
     primary_image_url: imgPro,
-    created_at: daysAgo(10),
-  },
-  {
-    id: "vitafit",
-    title: "VitaFit – Дневен мултивитамин",
-    slug: "vitafit",
-    description:
-      "Комплет од 23 нутриенти за тонус и виталност.",
-    price: 15.9,
-    primary_image_url: imgVitaFit,
-    created_at: daysAgo(12),
-  },
-  {
-    id: "stallion-power",
-    title: "Stallion Power – Машка енергија",
-    slug: "stallion-power",
-    description:
-      "Природна формула за сила и издржливост со мака и цинк.",
-    price: 29.9,
-    primary_image_url: imgStallion,
-    created_at: daysAgo(3),
+    created_at: daysAgo(14),
   },
 ];
+
+export function findProductBySlug(slug: string): Product | undefined {
+  return staticProducts.find((product) => product.slug === slug);
+}
+
+export function searchProducts(query?: string): Product[] {
+  if (!query) {
+    return staticProducts;
+  }
+
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) {
+    return staticProducts;
+  }
+
+  return staticProducts.filter((product) =>
+    `${product.title ?? ""} ${product.description ?? ""} ${product.slug ?? ""}`
+      .toLowerCase()
+      .includes(normalized)
+  );
+}
