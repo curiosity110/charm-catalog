@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400">
+  <defs>
+    <linearGradient id="gradSleep" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+  </defs>
+  <rect width="320" height="400" rx="32" fill="url(#gradSleep)" />
+  <g fill="#f8fafc" font-family="'Poppins', 'Segoe UI', sans-serif">
+    <text x="36" y="92" font-size="34" font-weight="600">Moonlight</text>
+    <text x="36" y="132" font-size="22" font-weight="500">Sleep Drops</text>
+    <text x="36" y="176" font-size="17" opacity="0.8">Мека смирувачка формула</text>
+    <text x="36" y="202" font-size="17" opacity="0.8">со валеријана и маточина.</text>
+  </g>
+  <g fill="#e0f2fe" opacity="0.7">
+    <circle cx="250" cy="110" r="36" />
+    <circle cx="270" cy="160" r="20" />
+    <circle cx="230" cy="160" r="16" />
+  </g>
+</svg>
