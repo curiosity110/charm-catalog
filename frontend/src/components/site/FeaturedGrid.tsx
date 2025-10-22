@@ -38,7 +38,8 @@ export function FeaturedGrid() {
   const featuredProducts = selectFeaturedProducts(products);
 
   const errorMessage =
-    error?.message || (error ? "Не можеме да ги вчитаме препорачаните производи." : null);
+    error?.message ||
+    (error ? "Не можеме да ги вчитаме препорачаните производи." : null);
 
   return (
     <section className="py-16">
@@ -69,11 +70,16 @@ export function FeaturedGrid() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {featuredProducts.map((product) => {
               const currentPrice = Number(product.price) || 0;
-              const oldPrice = Math.round(currentPrice * 1.15 * 100) / 100;
+              const oldPrice = Number((product as any).original_price) || 4800;
               const discount =
-                oldPrice > 0 ? Math.round(((oldPrice - currentPrice) / oldPrice) * 100) : 0;
+                oldPrice > 0
+                  ? Math.round(((oldPrice - currentPrice) / oldPrice) * 100)
+                  : 0;
               const primaryImage =
-                product.primary_image_url || product.image || product.image_url || null;
+                product.primary_image_url ||
+                product.image ||
+                product.image_url ||
+                null;
 
               return (
                 <Card
@@ -81,18 +87,20 @@ export function FeaturedGrid() {
                   className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20"
                 >
                   <div className="aspect-[4/3] bg-gradient-to-br from-primary-lighter/10 to-accent/20 relative overflow-hidden">
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary-light/10">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary-light/10 p-3">
                       {primaryImage ? (
                         <img
                           src={primaryImage}
                           alt={product.title}
-                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="h-full w-full object-contain"
                           loading="lazy"
                         />
                       ) : (
                         <div className="text-center">
                           <div className="text-4xl mb-2">🌿</div>
-                          <p className="text-xs text-muted-foreground">Слика на производ</p>
+                          <p className="text-xs text-muted-foreground">
+                            Слика на производ
+                          </p>
                         </div>
                       )}
                     </div>
@@ -115,7 +123,9 @@ export function FeaturedGrid() {
                     )}
 
                     <div className="flex items-center space-x-2">
-                      <span className="text-lg font-bold text-primary">{formatEUR(currentPrice)}</span>
+                      <span className="text-lg font-bold text-primary">
+                        {formatEUR(currentPrice)}
+                      </span>
                       <span className="text-sm text-muted-foreground line-through">
                         {formatEUR(oldPrice)}
                       </span>
@@ -143,7 +153,11 @@ export function FeaturedGrid() {
           </div>
         )}
 
-        {errorMessage && <div className="text-center text-destructive mb-12">{errorMessage}</div>}
+        {errorMessage && (
+          <div className="text-center text-destructive mb-12">
+            {errorMessage}
+          </div>
+        )}
 
         <div className="text-center">
           <Button

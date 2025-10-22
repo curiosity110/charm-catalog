@@ -5,14 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Currency formatting
+// Currency formatting (MKD - Denari)
+// Shows amounts like: 2.400 DENARI MKD (no decimals)
 export function formatEUR(amount: number): string {
-  return new Intl.NumberFormat("mk-MK", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  const formatted = new Intl.NumberFormat("mk-MK", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount || 0);
+  return `${formatted} MKD`;
 }
 
 // Slug generation

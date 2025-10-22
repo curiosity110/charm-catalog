@@ -4,6 +4,8 @@ export type Product = {
   slug: string;
   description?: string;
   price: number | string;
+  // Original, pre-discount price (for strikethrough display)
+  original_price?: number | string;
   primary_image_url?: string;
   image?: string;
   image_url?: string;
