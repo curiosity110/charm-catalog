@@ -219,12 +219,12 @@ export default function ProductDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product image */}
-          <div className="aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 to-primary-light/10">
+          <div className="aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 to-primary-light/10 p-4">
             {primaryImage ? (
               <img
                 src={primaryImage}
                 alt={product.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
@@ -246,7 +246,10 @@ export default function ProductDetailPage() {
                 <span className="text-3xl font-bold text-primary">
                   {formatEUR(Number(product.price) || 0)}
                 </span>
-                <Badge variant="secondary">Природно</Badge>
+                <span className="text-lg text-muted-foreground line-through">
+                  {formatEUR(Number((product as any).original_price) || 4800)}
+                </span>
+                {/* <Badge variant="secondary">Природно</Badge> */}
               </div>
               {product.description && (
                 <p className="text-muted-foreground mb-6">

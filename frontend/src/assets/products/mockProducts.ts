@@ -18,7 +18,8 @@ export const mockProducts: Product[] = [
     slug: "arthrovita",
     description:
       "Формула за подмачкување и флексибилност на зглобови со глукозамин, хондроитин и МСМ.",
-    price: 24.9,
+    price: 2400,
+    original_price: 4800,
     primary_image_url: imgArthro,
     created_at: daysAgo(2),
   },
@@ -28,7 +29,8 @@ export const mockProducts: Product[] = [
     slug: "cardivita",
     description:
       "Поддршка за кардиоваскуларно здравје со CoQ10, магнезиум и Б-витамини.",
-    price: 21.9,
+    price: 2400,
+    original_price: 4800,
     primary_image_url: imgCardi,
     created_at: daysAgo(1),
   },
@@ -38,7 +40,8 @@ export const mockProducts: Product[] = [
     slug: "diavita",
     description:
       "Билна поддршка за нормални нивоа на гликоза со цимет и берберин.",
-    price: 22.5,
+    price: 2400,
+    original_price: 4800,
     primary_image_url: imgDia,
     created_at: daysAgo(4),
   },
@@ -48,7 +51,8 @@ export const mockProducts: Product[] = [
     slug: "optivita",
     description:
       "Лутеин, зеаксантин и боровинка за заштита и удобност на очите.",
-    price: 19.9,
+    price: 2400,
+    original_price: 4800,
     primary_image_url: imgOpti,
     created_at: daysAgo(7),
   },
@@ -58,7 +62,8 @@ export const mockProducts: Product[] = [
     slug: "provita",
     description:
       "Цинк, витамин C и D3 за дневна одбрана и енергија.",
-    price: 17.9,
+    price: 2400,
+    original_price: 4800,
     primary_image_url: imgPro,
     created_at: daysAgo(10),
   },
@@ -68,7 +73,8 @@ export const mockProducts: Product[] = [
     slug: "vitafit",
     description:
       "Комплет од 23 нутриенти за тонус и виталност.",
-    price: 15.9,
+    price: 2400,
+    original_price: 4800,
     primary_image_url: imgVitaFit,
     created_at: daysAgo(12),
   },
@@ -78,7 +84,8 @@ export const mockProducts: Product[] = [
     slug: "stallion-power",
     description:
       "Природна формула за сила и издржливост со мака и цинк.",
-    price: 29.9,
+    price: 2400,
+    original_price: 4800,
     primary_image_url: imgStallion,
     created_at: daysAgo(3),
   },

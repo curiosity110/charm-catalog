@@ -152,7 +152,7 @@ export function CartSheet() {
                           <img
                             src={primaryImage}
                             alt={item.product.title}
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-contain p-1"
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-2xl">

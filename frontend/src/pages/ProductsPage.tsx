@@ -7,7 +7,13 @@ import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { fetchProducts, type Product } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
@@ -20,8 +26,14 @@ export default function ProductsPage() {
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
 
-  const searchQuery = useMemo(() => (searchParams.get("search") || "").trim(), [searchParams]);
-  const normalizedSearchQuery = useMemo(() => searchQuery.toLocaleLowerCase(), [searchQuery]);
+  const searchQuery = useMemo(
+    () => (searchParams.get("search") || "").trim(),
+    [searchParams]
+  );
+  const normalizedSearchQuery = useMemo(
+    () => searchQuery.toLocaleLowerCase(),
+    [searchQuery]
+  );
 
   const {
     data: products = [],
@@ -30,7 +42,8 @@ export default function ProductsPage() {
     error,
   } = useQuery<Product[], Error>({
     queryKey: ["products", normalizedSearchQuery],
-    queryFn: ({ signal }) => fetchProducts(normalizedSearchQuery || undefined, signal),
+    queryFn: ({ signal }) =>
+      fetchProducts(normalizedSearchQuery || undefined, signal),
     keepPreviousData: true,
     staleTime: 1000 * 30,
   });
@@ -42,7 +55,8 @@ export default function ProductsPage() {
 
     toast({
       title: "Грешка",
-      description: error.message || "Не можеме да ги вчитаме производите во моментов.",
+      description:
+        error.message || "Не можеме да ги вчитаме производите во моментов.",
       variant: "destructive",
     });
   }, [error, toast]);
@@ -72,7 +86,9 @@ export default function ProductsPage() {
         case "name":
           return a.title.localeCompare(b.title);
         default:
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
       }
     });
   }, [products, sortBy]);
@@ -132,7 +148,9 @@ export default function ProductsPage() {
             {isLoading
               ? "Се вчитува..."
               : sortedProducts.length
-              ? `${sortedProducts.length} производи${searchQuery ? ` за "${searchQuery}"` : ""}`
+              ? `${sortedProducts.length} производи${
+                  searchQuery ? ` за "${searchQuery}"` : ""
+                }`
               : searchQuery
               ? `Нема производи за "${searchQuery}"`
               : "Нема достапни производи"}
@@ -154,54 +172,71 @@ export default function ProductsPage() {
             ))}
           </div>
         ) : (
-          <div className={viewMode === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            : "space-y-4"
-          }>
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                : "space-y-4"
+            }
+          >
             {sortedProducts.map((product) => {
-              const primaryImage = product.primary_image_url || product.image || product.image_url || null;
+              const primaryImage =
+                product.primary_image_url ||
+                product.image ||
+                product.image_url ||
+                null;
 
               return (
-                <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20">
-                  <div className={viewMode === "grid" ? "aspect-[4/3]" : "aspect-[4/3] lg:aspect-[2/1]"}>
-                    <div className="w-full h-full bg-gradient-to-br from-primary/5 to-primary-light/10 flex items-center justify-center relative overflow-hidden">
+                <Card
+                  key={product.id}
+                  className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20"
+                >
+                  <div
+                    className={
+                      viewMode === "grid"
+                        ? "aspect-[4/3]"
+                        : "aspect-[4/3] lg:aspect-[2/1]"
+                    }
+                  >
+                    <div className="w-full h-full bg-gradient-to-br from-primary/5 to-primary-light/10 flex items-center justify-center relative overflow-hidden p-3">
                       {primaryImage ? (
                         <img
                           src={primaryImage}
                           alt={product.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-contain"
                         />
                       ) : (
                         <div className="text-center">
                           <div className="text-4xl mb-2">🌿</div>
-                          <p className="text-xs text-muted-foreground">Слика на производ</p>
+                          <p className="text-xs text-muted-foreground">
+                            Слика на производ
+                          </p>
                         </div>
                       )}
                     </div>
                   </div>
-                  
+
                   <CardContent className="p-4">
                     <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
                       {product.title}
                     </h3>
-                    
+
                     {product.description && (
                       <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                         {product.description}
                       </p>
                     )}
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-bold text-primary">
                         {formatEUR(Number(product.price) || 0)}
                       </span>
-                      
-                      <Badge variant="secondary" className="text-xs">
-                        Природно
-                      </Badge>
+                      <span className="text-sm text-muted-foreground line-through">
+                        {formatEUR(Number((product as any).original_price) || 4800)}
+                      </span>
                     </div>
                   </CardContent>
-                  
+
                   <CardFooter className="p-4 pt-0 flex gap-2">
                     <Button
                       className="flex-1 bg-primary hover:bg-primary-light"
