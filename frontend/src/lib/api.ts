@@ -1,7 +1,10 @@
-import type { Order, Product } from "@/lib/types";
+import { mockProducts } from "@/assets/products/mockProducts";
+import type { Order, OrderItem, Product } from "@/lib/types";
 
 const DEFAULT_API_BASE_URL = "http://localhost:8000";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
+
+const MOCK_PRODUCT_SAMPLE_SIZE = 5;
 
 type RequestOptions = RequestInit & { signal?: AbortSignal };
 
@@ -25,29 +28,68 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return data as T;
 }
 
-export async function fetchProducts(search?: string, signal?: AbortSignal): Promise<Product[]> {
-  const query = search ? `?search=${encodeURIComponent(search)}` : "";
-  return request<Product[]>(`/api/products${query}`, { signal });
+function matchesSearch(product: Product, search?: string): boolean {
+  if (!search) {
+    return true;
+  }
+
+  const haystack = `${product.title ?? ""} ${product.description ?? ""} ${product.slug ?? ""}`.toLowerCase();
+  return haystack.includes(search.trim().toLowerCase());
 }
 
-export async function fetchProductBySlug(
-  slug: string,
-  signal?: AbortSignal
-): Promise<Product | null> {
-  const response = await fetch(`${API_BASE_URL}/api/products/${slug}`, { signal });
-
-  if (response.status === 404) {
-    return null;
+function sampleMockProducts(search?: string): Product[] {
+  const filtered = mockProducts.filter((product) => matchesSearch(product, search));
+  if (filtered.length <= MOCK_PRODUCT_SAMPLE_SIZE) {
+    return filtered;
   }
 
-  if (!response.ok) {
-    const text = await response.text();
-    const detail = text ? (JSON.parse(text) as { detail?: string }).detail : null;
-    throw new Error(detail || response.statusText);
+  const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, MOCK_PRODUCT_SAMPLE_SIZE);
+}
+
+export async function fetchProducts(search?: string, signal?: AbortSignal): Promise<Product[]> {
+  const query = search ? `?search=${encodeURIComponent(search)}` : "";
+
+  try {
+    const data = await request<Product[]>(`/api/products${query}`, { signal });
+    if (Array.isArray(data) && data.length > 0) {
+      return data;
+    }
+
+    console.warn("Product API returned no data. Falling back to mock products.");
+  } catch (error) {
+    console.warn("Failed to load products from API. Falling back to mock products.", error);
   }
 
-  const data = (await response.json()) as Product;
-  return data;
+  const fallback = sampleMockProducts(search);
+  if (fallback.length === 0) {
+    throw new Error("Нема достапни пример производи во моментов.");
+  }
+
+  return fallback;
+}
+
+export async function fetchProductBySlug(slug: string, signal?: AbortSignal): Promise<Product | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/products/${slug}`, { signal });
+
+    if (response.status === 404) {
+      console.warn(`Product with slug "${slug}" not found on API. Falling back to mock data.`);
+    } else if (!response.ok) {
+      const text = await response.text();
+      const detail = text ? (JSON.parse(text) as { detail?: string }).detail : null;
+      throw new Error(detail || response.statusText);
+    } else {
+      const product = (await response.json()) as Product;
+      if (product) {
+        return product;
+      }
+    }
+  } catch (error) {
+    console.warn(`Failed to load product "${slug}" from API. Using mock product if available.`, error);
+  }
+
+  return mockProducts.find((product) => product.slug === slug) ?? null;
 }
 
 export interface OrderRequestPayload {
@@ -63,8 +105,8 @@ export interface OrderRequestPayload {
   }>;
 }
 
-export async function submitOrderRequest(payload: OrderRequestPayload): Promise<Order> {
-  const body = {
+function buildOrderBody(payload: OrderRequestPayload) {
+  return {
     customer_name: payload.customerName,
     customer_phone: payload.customerPhone,
     customer_email: payload.customerEmail,
@@ -76,11 +118,40 @@ export async function submitOrderRequest(payload: OrderRequestPayload): Promise<
       quantity: item.quantity,
     })),
   };
+}
 
-  return request<Order>("/api/orders", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
+function buildMockOrder(payload: OrderRequestPayload): Order {
+  const createdAt = new Date().toISOString();
+
+  const items: OrderItem[] = payload.items.map((item) => ({
+    product_id: item.productId,
+    quantity: item.quantity,
+    product: mockProducts.find((product) => product.id === item.productId),
+  }));
+
+  return {
+    id: `demo-${Date.now()}`,
+    status: "pending",
+    created_at: createdAt,
+    customer_name: payload.customerName,
+    customer_phone: payload.customerPhone,
+    customer_email: payload.customerEmail ?? null,
+    customer_address: payload.customerAddress ?? null,
+    notes: payload.notes ?? null,
+    items,
+  };
+}
+
+export async function submitOrderRequest(payload: OrderRequestPayload): Promise<Order> {
+  try {
+    return await request<Order>("/api/orders", {
+      method: "POST",
+      body: JSON.stringify(buildOrderBody(payload)),
+    });
+  } catch (error) {
+    console.warn("Failed to submit order to API. Returning mock confirmation instead.", error);
+    return buildMockOrder(payload);
+  }
 }
 
 export type { Product };

@@ -1,7 +1,5 @@
-// src/assets/products/mockProducts.ts
-import type { Product } from "@/lib/api";
+import type { Product } from "@/lib/types";
 
-// Import images so Vite resolves URLs correctly
 import imgArthro from "./ArhroVita.jpeg";
 import imgCardi from "./CardiVita.jpeg";
 import imgDia from "./DiaVita.jpeg";
