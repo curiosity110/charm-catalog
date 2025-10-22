@@ -312,7 +312,7 @@ export default function ProductDetailPage() {
 
                   <Button
                     type="submit"
-                    className="w-full"
+                    className="w-full flex-1 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold"
                     disabled={submitting}
                   >
                     {submitting ? "Се испраќа..." : "Нарачај сега"}
