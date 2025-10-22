@@ -198,7 +198,7 @@ export default function ProductsPage() {
                         : "aspect-[4/3] lg:aspect-[2/1]"
                     }
                   >
-                    <div className="w-full h-full bg-gradient-to-br from-primary/5 to-primary-light/10 flex items-center justify-center relative overflow-hidden p-3">
+                    <div className="w-full h-full bg-transparent flex items-center justify-center relative overflow-hidden p-2 sm:p-3 md:p-4">
                       {primaryImage ? (
                         <img
                           src={primaryImage}

@@ -7,22 +7,22 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-background"></div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center justify-center text-center">
           {/* Content */}
-          <div className="text-left">
+          <div className="flex flex-col items-center justify-center text-center mx-auto">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 font-[var(--font-script)]">
               <span className="text-primary">Додатоци во исхраната</span>
               <br />
               <span className="text-muted-foreground">и природни креми</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-lg leading-relaxed">
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl leading-relaxed">
               Внимателно одбрани билни мешавини наменети за зајакнување на
               имунолошкиот систем, балансирање на метаболизмот и природна помош
               за вашата кожа и коса.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 asChild
                 size="lg"
@@ -41,8 +41,6 @@ export function Hero() {
               </Button>
             </div>
           </div>
-
-          {/* Image */}
         </div>
       </div>
     </section>

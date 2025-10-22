@@ -147,7 +147,7 @@ export function CartSheet() {
                       key={item.product.id}
                       className="flex gap-4 rounded-lg border border-border/50 p-4"
                     >
-                      <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
+                      <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-transparent">
                         {primaryImage ? (
                           <img
                             src={primaryImage}

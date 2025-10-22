@@ -70,7 +70,7 @@ export function FeaturedGrid() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {featuredProducts.map((product) => {
               const currentPrice = Number(product.price) || 0;
-              const oldPrice = Math.round(currentPrice * 1.15 * 100) / 100;
+              const oldPrice = Number((product as any).original_price) || 4800;
               const discount =
                 oldPrice > 0
                   ? Math.round(((oldPrice - currentPrice) / oldPrice) * 100)
@@ -86,13 +86,13 @@ export function FeaturedGrid() {
                   key={product.id}
                   className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20"
                 >
-                  <div className="aspect-[4/3] bg-gradient-to-br from-primary-lighter/10 to-accent/20 relative overflow-hidden">
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary-light/10">
+                  <div className="aspect-[4/3] relative overflow-hidden bg-transparent">
+                    <div className="w-full h-full flex items-center justify-center bg-transparent p-2 sm:p-3 md:p-4">
                       {primaryImage ? (
                         <img
                           src={primaryImage}
                           alt={product.title}
-                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="h-full w-full object-contain"
                           loading="lazy"
                         />
                       ) : (
@@ -106,7 +106,7 @@ export function FeaturedGrid() {
                     </div>
                     {discount > 0 && (
                       <Badge className="absolute top-3 left-3 bg-destructive hover:bg-destructive/90">
-                        -{50}%
+                        -{discount}%
                       </Badge>
                     )}
                   </div>
@@ -127,7 +127,7 @@ export function FeaturedGrid() {
                         {formatEUR(currentPrice)}
                       </span>
                       <span className="text-sm text-muted-foreground line-through">
-                        {formatEUR(oldPrice + 2040)}
+                        {formatEUR(oldPrice)}
                       </span>
                     </div>
                   </CardContent>
