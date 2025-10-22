@@ -106,7 +106,7 @@ export function FeaturedGrid() {
                     </div>
                     {discount > 0 && (
                       <Badge className="absolute top-3 left-3 bg-destructive hover:bg-destructive/90">
-                        -{discount}%
+                        -{50}%
                       </Badge>
                     )}
                   </div>
@@ -127,7 +127,7 @@ export function FeaturedGrid() {
                         {formatEUR(currentPrice)}
                       </span>
                       <span className="text-sm text-muted-foreground line-through">
-                        {formatEUR(oldPrice)}
+                        {formatEUR(oldPrice + 2040)}
                       </span>
                     </div>
                   </CardContent>

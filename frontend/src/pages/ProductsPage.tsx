@@ -232,19 +232,22 @@ export default function ProductsPage() {
                         {formatEUR(Number(product.price) || 0)}
                       </span>
                       <span className="text-sm text-muted-foreground line-through">
-                        {formatEUR(Number((product as any).original_price) || 4800)}
+                        {formatEUR(
+                          Number((product as any).original_price) || 4800
+                        )}
                       </span>
                     </div>
                   </CardContent>
 
                   <CardFooter className="p-4 pt-0 flex gap-2">
                     <Button
-                      className="flex-1 bg-primary hover:bg-primary-light"
+                      className="flex-1 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold"
                       onClick={() => handleAddToCart(product)}
                     >
                       <ShoppingCart className="mr-2 h-4 w-4" />
                       Во кошничка
                     </Button>
+
                     <Button
                       asChild
                       variant="outline"

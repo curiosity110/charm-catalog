@@ -323,7 +323,13 @@ export function CartSheet() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={submitting}>
+              <Button
+                type="submit"
+                className="w-full
+               bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold
+              "
+                disabled={submitting}
+              >
                 {submitting ? "Испраќање..." : "Потврди нарачка"}
               </Button>
             </form>

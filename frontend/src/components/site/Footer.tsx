@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import VitaCall_Logo from "@/assets/vita-call-logo.png";
 
 const footerLinks = {
   useful: [
@@ -23,7 +24,21 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="text-2xl font-bold text-primary mb-4 font-[var(--font-script)]">
-              Vita Call
+              <Link
+                to="/"
+                className="relative flex items-center justify-center group"
+              >
+                <img
+                  src={VitaCall_Logo}
+                  alt="VitaCall Logo"
+                  className="
+      h-14 sm:h-16 w-auto object-contain
+      transition-transform duration-300 ease-out
+      group-hover:scale-110
+      transform-gpu will-change-transform
+    "
+                />
+              </Link>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               Природни решенија за вашето здравје и убавина. Сертифицирани

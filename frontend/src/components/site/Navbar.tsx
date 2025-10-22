@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { CartSheet } from "./CartSheet";
 import { Input } from "@/components/ui/input";
 // import VitaCall-Logo from "@/assets/vita-call-logo.svg";
+import VitaCall_Logo from "@/assets/vita-call-logo.png";
 
 const navigation = [
   { name: "ПОЧЕТНА", href: "/" },
@@ -56,7 +57,21 @@ export function Navbar() {
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2">
               <div className="text-2xl font-bold text-primary font-[var(--font-script)]">
-                Vita Call
+                <Link
+                  to="/"
+                  className="relative flex items-center justify-center group"
+                >
+                  <img
+                    src={VitaCall_Logo}
+                    alt="VitaCall Logo"
+                    className="
+      h-14 sm:h-14 w-auto object-contain
+      transition-transform duration-300 ease-out
+      group-hover:scale-110 
+      transform-gpu will-change-transform
+    "
+                  />
+                </Link>
               </div>
             </Link>
           </div>
