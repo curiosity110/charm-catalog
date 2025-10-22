@@ -70,7 +70,7 @@ export function FeaturedGrid() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {featuredProducts.map((product) => {
               const currentPrice = Number(product.price) || 0;
-              const oldPrice = Number((product as any).original_price) || 4800;
+              const oldPrice = Math.round(currentPrice * 1.15 * 100) / 100;
               const discount =
                 oldPrice > 0
                   ? Math.round(((oldPrice - currentPrice) / oldPrice) * 100)
@@ -87,12 +87,12 @@ export function FeaturedGrid() {
                   className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20"
                 >
                   <div className="aspect-[4/3] bg-gradient-to-br from-primary-lighter/10 to-accent/20 relative overflow-hidden">
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary-light/10 p-3">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary-light/10">
                       {primaryImage ? (
                         <img
                           src={primaryImage}
                           alt={product.title}
-                          className="h-full w-full object-contain"
+                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                           loading="lazy"
                         />
                       ) : (
@@ -135,7 +135,7 @@ export function FeaturedGrid() {
                   <CardFooter className="p-4 pt-0 flex gap-2">
                     <Button
                       asChild
-                      className="flex-1 bg-primary hover:bg-primary-light"
+                      className="flex-1 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold"
                     >
                       <Link to={`/products/${product.slug}`}>Нарачај</Link>
                     </Button>
