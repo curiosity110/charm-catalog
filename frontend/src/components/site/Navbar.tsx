@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { CartSheet } from "./CartSheet";
 import { Input } from "@/components/ui/input";
+// import VitaCall-Logo from "@/assets/vita-call-logo.svg";
 
 const navigation = [
   { name: "ПОЧЕТНА", href: "/" },

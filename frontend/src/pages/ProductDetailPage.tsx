@@ -12,7 +12,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
-import { fetchProductBySlug, submitOrderRequest, type Product } from "@/lib/api";
+import {
+  fetchProductBySlug,
+  submitOrderRequest,
+  type Product,
+} from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
 
 export default function ProductDetailPage() {
@@ -26,7 +30,7 @@ export default function ProductDetailPage() {
     customerEmail: "",
     customerAddress: "",
     quantity: 1,
-    notes: ""
+    notes: "",
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -55,7 +59,11 @@ export default function ProductDetailPage() {
     }
 
     setSelectedImage((current) => {
-      const availableImages = [product.primary_image_url, product.image, product.image_url].filter(Boolean) as string[];
+      const availableImages = [
+        product.primary_image_url,
+        product.image,
+        product.image_url,
+      ].filter(Boolean) as string[];
       if (current && availableImages.includes(current)) {
         return current;
       }
@@ -71,7 +79,8 @@ export default function ProductDetailPage() {
     console.error("Error loading product:", error);
     toast({
       title: "Грешка",
-      description: error.message || "Не можеме да ги вчитаме деталите за овој производ.",
+      description:
+        error.message || "Не можеме да ги вчитаме деталите за овој производ.",
       variant: "destructive",
     });
   }, [error, toast]);
@@ -101,8 +110,8 @@ export default function ProductDetailPage() {
       });
 
       toast({
-        title: "Нарачката е успешно испратена!",
-        description: "Ќе ве контактираме наскоро за потврда на нарачката."
+        title: "Ќе ве контактире Аѓент за 15 минути",
+        description: "Ќе ве контактираме наскоро за потврда на нарачката.",
       });
 
       // Reset form
@@ -112,14 +121,15 @@ export default function ProductDetailPage() {
         customerEmail: "",
         customerAddress: "",
         quantity: 1,
-        notes: ""
+        notes: "",
       });
-
     } catch (error: any) {
       toast({
         title: "Грешка",
-        description: error?.message || "Се случи грешка при испраќање на нарачката. Обидете се повторно.",
-        variant: "destructive"
+        description:
+          error?.message ||
+          "Се случи грешка при испраќање на нарачката. Обидете се повторно.",
+        variant: "destructive",
       });
       console.error("Error creating request:", error);
     } finally {
@@ -154,9 +164,12 @@ export default function ProductDetailPage() {
         <Navbar />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12 space-y-4">
-            <h1 className="text-2xl font-bold text-foreground">Се појави грешка</h1>
+            <h1 className="text-2xl font-bold text-foreground">
+              Се појави грешка
+            </h1>
             <p className="text-muted-foreground">
-              {error.message || "Не можеме да ги вчитаме деталите за овој производ во моментов."}
+              {error.message ||
+                "Не можеме да ги вчитаме деталите за овој производ во моментов."}
             </p>
             <Button asChild>
               <Link to="/products">Назад кон производи</Link>
@@ -173,7 +186,9 @@ export default function ProductDetailPage() {
         <Navbar />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-foreground mb-4">Производот не е најден</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-4">
+              Производот не е најден
+            </h1>
             <Button asChild>
               <Link to="/products">Назад кон производи</Link>
             </Button>
@@ -184,14 +199,16 @@ export default function ProductDetailPage() {
   }
 
   const images = product
-    ? ([product.primary_image_url, product.image, product.image_url].filter(Boolean) as string[])
+    ? ([product.primary_image_url, product.image, product.image_url].filter(
+        Boolean
+      ) as string[])
     : [];
   const primaryImage = selectedImage || images[0] || null;
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button asChild variant="ghost" className="mb-4">
           <Link to="/products" className="flex items-center gap-2">
@@ -204,7 +221,11 @@ export default function ProductDetailPage() {
           {/* Product image */}
           <div className="aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 to-primary-light/10">
             {primaryImage ? (
-              <img src={primaryImage} alt={product.title} className="w-full h-full object-cover" />
+              <img
+                src={primaryImage}
+                alt={product.title}
+                className="w-full h-full object-cover"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <div className="text-center">
@@ -218,17 +239,26 @@ export default function ProductDetailPage() {
           {/* Product info & form */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-4">{product.title}</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-4">
+                {product.title}
+              </h1>
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-3xl font-bold text-primary">{formatEUR(Number(product.price) || 0)}</span>
+                <span className="text-3xl font-bold text-primary">
+                  {formatEUR(Number(product.price) || 0)}
+                </span>
                 <Badge variant="secondary">Природно</Badge>
               </div>
               {product.description && (
-                <p className="text-muted-foreground mb-6">{product.description}</p>
+                <p className="text-muted-foreground mb-6">
+                  {product.description}
+                </p>
               )}
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <Button className="bg-primary hover:bg-primary-light" onClick={handleAddToCart}>
+                <Button
+                  className="bg-primary hover:bg-primary-light"
+                  onClick={handleAddToCart}
+                >
                   <ShoppingCart className="mr-2 h-4 w-4" />
                   Додади во кошничка
                 </Button>
@@ -251,7 +281,12 @@ export default function ProductDetailPage() {
                       id="order-name"
                       placeholder="Пример: Ана Анастасова"
                       value={formData.customerName}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, customerName: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          customerName: e.target.value,
+                        }))
+                      }
                       required
                     />
                   </div>
@@ -262,61 +297,21 @@ export default function ProductDetailPage() {
                       id="order-phone"
                       placeholder="07X XXX XXX"
                       value={formData.customerPhone}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, customerPhone: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          customerPhone: e.target.value,
+                        }))
+                      }
                       required
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="order-email">Е-пошта</Label>
-                    <Input
-                      id="order-email"
-                      placeholder="optional@example.com"
-                      type="email"
-                      value={formData.customerEmail}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, customerEmail: e.target.value }))}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="order-quantity">Количина</Label>
-                      <Input
-                        id="order-quantity"
-                        type="number"
-                        min={1}
-                        value={formData.quantity}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            quantity: Math.max(1, Number(e.target.value) || 1),
-                          }))
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="order-address">Адреса за достава</Label>
-                      <Input
-                        id="order-address"
-                        placeholder="Ул. Пример бр. 1, Скопје"
-                        value={formData.customerAddress}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, customerAddress: e.target.value }))}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="order-notes">Забелешка</Label>
-                    <Textarea
-                      id="order-notes"
-                      placeholder="Дополнителни информации за доставата"
-                      rows={3}
-                      value={formData.notes}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
-                    />
-                  </div>
-
-                  <Button type="submit" className="w-full" disabled={submitting}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={submitting}
+                  >
                     {submitting ? "Се испраќа..." : "Нарачај сега"}
                   </Button>
                 </form>
