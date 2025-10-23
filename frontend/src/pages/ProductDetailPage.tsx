@@ -219,7 +219,7 @@ export default function ProductDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product image */}
-          <div className="aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 to-primary-light/10 p-4">
+          <div className="aspect-square rounded-lg overflow-hidden bg-transparent p-2 sm:p-4 md:p-6">
             {primaryImage ? (
               <img
                 src={primaryImage}
