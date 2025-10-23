@@ -127,6 +127,10 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* Responsive helpers for 1000px breakpoint without changing Tailwind config */
@@ -145,4 +149,79 @@ input[type="search"]::-webkit-search-results-decoration {
 @media (max-width: 999.98px) {
   .show-desktop-1000 { display: none !important; }
   .hide-desktop-1000 { display: inline-flex !important; }
+}
+
+.reveal-init {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-init {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.5;
+  animation: float-slow 16s ease-in-out infinite;
+}
+
+.hero-blob:nth-child(1) {
+  background: radial-gradient(circle at center, hsl(82 39% 45% / 0.7), transparent 65%);
+  width: 320px;
+  height: 320px;
+  top: -60px;
+  left: -40px;
+}
+
+.hero-blob:nth-child(2) {
+  background: radial-gradient(circle at center, hsl(45 80% 65% / 0.6), transparent 70%);
+  width: 280px;
+  height: 280px;
+  bottom: -80px;
+  right: -60px;
+  animation-delay: 3s;
+}
+
+.hero-blob:nth-child(3) {
+  background: radial-gradient(circle at center, hsl(192 70% 80% / 0.45), transparent 70%);
+  width: 260px;
+  height: 260px;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 6s;
+}
+
+@keyframes float-slow {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(12px, -24px, 0) scale(1.05);
+  }
+  100% {
+    transform: translate3d(-12px, 16px, 0) scale(1);
+  }
 }
