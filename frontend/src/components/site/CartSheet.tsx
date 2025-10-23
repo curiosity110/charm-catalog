@@ -60,7 +60,7 @@ export function CartSheet() {
     if (!items.length) return;
 
     if (!formData.customerName || !formData.customerPhone) {
-      toast({
+      toast({ position: "center",
         title: "Недостасуваат податоци",
         description:
           "Внесете ги вашето име и телефон за да ја потврдите нарачката.",
@@ -83,7 +83,7 @@ export function CartSheet() {
         })),
       });
 
-      toast({
+      toast({ position: "center",
         title: "Нарачката е испратена",
         description: `Број на барање: ${order.id}. Ќе ве контактираме за потврда.`,
       });
@@ -92,7 +92,7 @@ export function CartSheet() {
       setFormData(initialFormState);
       setOpen(false);
     } catch (error: any) {
-      toast({
+      toast({ position: "center",
         title: "Грешка",
         description:
           error?.message ||

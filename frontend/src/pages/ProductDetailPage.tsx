@@ -49,7 +49,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (!product) {
       if (!isLoading && !isFetching && slug && !error) {
-        toast({
+        toast({ position: "center",
           title: "Производот не е достапен",
           description: "Производот што го барате не постои или е неактивен.",
           variant: "destructive",
@@ -77,7 +77,7 @@ export default function ProductDetailPage() {
     }
 
     console.error("Error loading product:", error);
-    toast({
+    toast({ position: "center",
       title: "Грешка",
       description:
         error.message || "Не можеме да ги вчитаме деталите за овој производ.",
@@ -109,7 +109,7 @@ export default function ProductDetailPage() {
         ],
       });
 
-      toast({
+      toast({ position: "center",
         title: "Ќе ве контактире Аѓент за 15 минути",
         description: "Ќе ве контактираме наскоро за потврда на нарачката.",
       });
@@ -124,7 +124,7 @@ export default function ProductDetailPage() {
         notes: "",
       });
     } catch (error: any) {
-      toast({
+      toast({ position: "center",
         title: "Грешка",
         description:
           error?.message ||
@@ -140,7 +140,7 @@ export default function ProductDetailPage() {
   const handleAddToCart = () => {
     if (!product) return;
     addItem(product, Math.max(1, formData.quantity));
-    toast({
+    toast({ position: "center",
       title: "Додадено во кошничка",
       description: `${product.title} е додаден во вашата кошничка.`,
     });
