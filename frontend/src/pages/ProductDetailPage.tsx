@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +62,6 @@ export default function ProductDetailPage() {
       return;
     }
 
-    console.error("Error loading product:", error);
     toast({
       position: "center",
       title: "Грешка",
@@ -138,20 +138,22 @@ export default function ProductDetailPage() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Button asChild variant="ghost" className="mb-4">
-          <Link to="/products" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Назад кон производи
-          </Link>
-        </Button>
+        <ScrollReveal className="mb-4 inline-flex">
+          <Button asChild variant="ghost">
+            <Link to="/products" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Назад кон производи
+            </Link>
+          </Button>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="aspect-square rounded-lg overflow-hidden bg-transparent p-2 sm:p-4 md:p-6">
+          <ScrollReveal className="aspect-square rounded-lg overflow-hidden bg-transparent p-2 sm:p-4 md:p-6">
             {primaryImage ? (
               <img
                 src={primaryImage}
                 alt={product.title}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain transition-transform duration-700 ease-out hover:scale-105"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
@@ -161,9 +163,9 @@ export default function ProductDetailPage() {
                 </div>
               </div>
             )}
-          </div>
+          </ScrollReveal>
 
-          <div className="space-y-6">
+          <ScrollReveal className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-4">
                 {product.title}
@@ -183,40 +185,42 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Нарачај сега - Плати при достава</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Оставете ги вашите податоци во формата и нашиот тим ќе ве
-                  контактира за да ја потврди нарачката и да договори достава.
-                </p>
+            <ScrollReveal delay={120}>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Нарачај сега - Плати при достава</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Оставете ги вашите податоци во формата и нашиот тим ќе ве
+                    контактира за да ја потврди нарачката и да договори достава.
+                  </p>
 
-                <Badge
-                  variant="outline"
-                  className="w-fit border-primary text-primary bg-primary/5"
-                >
-                  Плаќање при достава
-                </Badge>
+                  <Badge
+                    variant="outline"
+                    className="w-fit border-primary text-primary bg-primary/5"
+                  >
+                    Плаќање при достава
+                  </Badge>
 
-                <QuickOrderDialog
-                  product={product}
-                  trigger={
-                    <Button className="w-full h-12 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold">
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      Нарачај
-                    </Button>
-                  }
-                />
+                  <QuickOrderDialog
+                    product={product}
+                    trigger={
+                      <Button className="w-full h-12 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold transition-colors duration-300">
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        Нарачај
+                      </Button>
+                    }
+                  />
 
-                <p className="text-xs text-muted-foreground">
-                  * Вашите податоци ги користиме само за да ја потврдиме
-                  нарачката. Можете да се предомислите при телефонската потврда.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+                  <p className="text-xs text-muted-foreground">
+                    * Вашите податоци ги користиме само за да ја потврдиме
+                    нарачката. Можете да се предомислите при телефонската потврда.
+                  </p>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
+          </ScrollReveal>
         </div>
       </main>
 

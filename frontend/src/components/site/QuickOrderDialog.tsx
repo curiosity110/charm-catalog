@@ -118,7 +118,9 @@ export function QuickOrderDialog({ product, trigger }: QuickOrderDialogProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent
+        className="max-w-md data-[state=open]:animate-in data-[state=open]:fade-in-90 data-[state=open]:zoom-in-95 data-[state=open]:duration-300 data-[state=open]:ease-out data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+      >
         <DialogHeader>
           <DialogTitle>Нарачај {product.title}</DialogTitle>
           <DialogDescription>
@@ -129,13 +131,13 @@ export function QuickOrderDialog({ product, trigger }: QuickOrderDialogProps) {
 
         <ScrollArea className="max-h-[70vh] pr-4">
           <div className="space-y-4 py-1">
-            <div className="flex items-center gap-4 rounded-lg border border-border/60 bg-muted/20 p-4">
+            <div className="group flex items-center gap-4 rounded-lg border border-border/60 bg-muted/20 p-4 transition-transform duration-300 ease-out">
               {primaryImage ? (
-                <div className="relative h-16 w-16 overflow-hidden rounded-md bg-background">
+                <div className="relative h-16 w-16 overflow-hidden rounded-md bg-background shadow-sm">
                   <img
                     src={primaryImage}
                     alt={product.title}
-                    className="absolute inset-0 h-full w-full object-contain"
+                    className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
               ) : (

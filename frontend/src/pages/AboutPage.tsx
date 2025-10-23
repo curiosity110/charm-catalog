@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -48,7 +49,7 @@ export default function AboutPage() {
       <Navbar />
       <main className="flex-1">
         <section className="bg-gradient-to-b from-accent/20 to-background py-16">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          <ScrollReveal className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             <Badge
               variant="secondary"
               className="uppercase tracking-wide text-primary"
@@ -64,12 +65,12 @@ export default function AboutPage() {
               благосостојба. Нашата мисија е да внесеме моменти на грижа и
               радост во секојдневните ритуали.
             </p>
-          </div>
+          </ScrollReveal>
         </section>
 
         <section className="py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-8 md:grid-cols-2">
-            <div className="space-y-6">
+            <ScrollReveal className="space-y-6">
               <h2 className="text-2xl md:text-3xl font-semibold">
                 Нашиот пристап
               </h2>
@@ -86,20 +87,22 @@ export default function AboutPage() {
                 развој за да понудиме нови решенија засновани на современи
                 научни сознанија и традиционални рецепти.
               </p>
-            </div>
+            </ScrollReveal>
 
             <div className="grid gap-4">
-              {values.map((value) => (
-                <Card key={value.title} className="border-border/60">
-                  <CardContent className="p-6 space-y-2 text-left">
-                    <h3 className="text-xl font-semibold text-foreground">
-                      {value.title}
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {value.description}
-                    </p>
-                  </CardContent>
-                </Card>
+              {values.map((value, index) => (
+                <ScrollReveal key={value.title} delay={index * 120}>
+                  <Card className="border-border/60">
+                    <CardContent className="p-6 space-y-2 text-left">
+                      <h3 className="text-xl font-semibold text-foreground">
+                        {value.title}
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {value.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </ScrollReveal>
               ))}
             </div>
           </div>
@@ -107,25 +110,26 @@ export default function AboutPage() {
 
         <section className="bg-muted/30 py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl md:text-3xl font-semibold text-center mb-10">
-              Клучни моменти
-            </h2>
+            <ScrollReveal className="text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-semibold">
+                Клучни моменти
+              </h2>
+            </ScrollReveal>
             <div className="grid gap-6 md:grid-cols-3">
-              {milestones.map((milestone) => (
-                <Card
-                  key={milestone.year}
-                  className="border-border/60 text-center"
-                >
-                  <CardContent className="p-6 space-y-3">
-                    <span className="text-sm font-semibold uppercase tracking-wide text-primary">
-                      {milestone.year}
-                    </span>
-                    <h3 className="text-xl font-semibold">{milestone.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {milestone.description}
-                    </p>
-                  </CardContent>
-                </Card>
+              {milestones.map((milestone, index) => (
+                <ScrollReveal key={milestone.year} delay={index * 120}>
+                  <Card className="border-border/60 text-center">
+                    <CardContent className="p-6 space-y-3">
+                      <span className="text-sm font-semibold uppercase tracking-wide text-primary">
+                        {milestone.year}
+                      </span>
+                      <h3 className="text-xl font-semibold">{milestone.title}</h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {milestone.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </ScrollReveal>
               ))}
             </div>
           </div>

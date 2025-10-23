@@ -52,9 +52,9 @@ export async function fetchProducts(search?: string, signal?: AbortSignal): Prom
       return data;
     }
 
-    console.warn("Product API returned no data. Falling back to mock products.");
+    // Fall back to mock products when the API returns an empty result set.
   } catch (error) {
-    console.warn("Failed to load products from API. Falling back to mock products.", error);
+    // Fall back to mock products if the API request fails.
   }
 
   const fallback = sampleMockProducts(search);
@@ -70,7 +70,7 @@ export async function fetchProductBySlug(slug: string, signal?: AbortSignal): Pr
     const response = await fetch(`${API_BASE_URL}/api/products/${slug}`, { signal });
 
     if (response.status === 404) {
-      console.warn(`Product with slug "${slug}" not found on API. Falling back to mock data.`);
+      // Fall through to mock data when the product is not found via the API.
     } else if (!response.ok) {
       const text = await response.text();
       const detail = text ? (JSON.parse(text) as { detail?: string }).detail : null;
@@ -82,7 +82,7 @@ export async function fetchProductBySlug(slug: string, signal?: AbortSignal): Pr
       }
     }
   } catch (error) {
-    console.warn(`Failed to load product "${slug}" from API. Using mock product if available.`, error);
+    // Fall back to mock data when the API request fails.
   }
 
   return mockProducts.find((product) => product.slug === slug) ?? null;
@@ -145,7 +145,7 @@ export async function submitOrderRequest(payload: OrderRequestPayload): Promise<
       body: JSON.stringify(buildOrderBody(payload)),
     });
   } catch (error) {
-    console.warn("Failed to submit order to API. Returning mock confirmation instead.", error);
+    // Provide a mock confirmation if the API submission fails.
     return buildMockOrder(payload);
   }
 }

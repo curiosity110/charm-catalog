@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -44,14 +45,14 @@ export function FeaturedGrid() {
   return (
     <section className="py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+        <ScrollReveal className="text-center mb-12 space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">
             Препорачани производи
           </h2>
           <p className="text-lg text-muted-foreground">
             Откријте ги нашите најпопуларни природни решенија
           </p>
-        </div>
+        </ScrollReveal>
 
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -68,7 +69,7 @@ export function FeaturedGrid() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {featuredProducts.map((product) => {
+            {featuredProducts.map((product, index) => {
               const currentPrice = Number(product.price) || 0;
               const oldPrice = Number((product as any).original_price) || 4800;
               const discount =
@@ -80,17 +81,16 @@ export function FeaturedGrid() {
                 product.image ||
                 product.image_url ||
                 null;
-
               return (
-                <Card
-                  key={product.id}
-                  className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20"
-                >
-                  <div className="aspect-[4/3] relative overflow-hidden bg-transparent">
-                    <div className="w-full h-full flex items-center justify-center bg-transparent p-2 sm:p-3 md:p-4">
-                      {primaryImage ? (
-                        <img
-                          src={primaryImage}
+                <ScrollReveal key={product.id} delay={index * 100} className="h-full">
+                  <Card
+                    className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 hover:border-primary/20 h-full"
+                  >
+                    <div className="aspect-[4/3] relative overflow-hidden bg-transparent">
+                      <div className="w-full h-full flex items-center justify-center bg-transparent p-2 sm:p-3 md:p-4">
+                        {primaryImage ? (
+                          <img
+                            src={primaryImage}
                           alt={product.title}
                           className="h-full w-full object-contain"
                           loading="lazy"
@@ -111,43 +111,44 @@ export function FeaturedGrid() {
                     )}
                   </div>
 
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                      {product.title}
-                    </h3>
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                        {product.title}
+                      </h3>
 
-                    {product.description && (
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
-                        {product.description}
-                      </p>
-                    )}
+                      {product.description && (
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
+                          {product.description}
+                        </p>
+                      )}
 
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg font-bold text-primary">
-                        {formatEUR(currentPrice)}
-                      </span>
-                      <span className="text-sm text-muted-foreground line-through">
-                        {formatEUR(oldPrice)}
-                      </span>
-                    </div>
-                  </CardContent>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-lg font-bold text-primary">
+                          {formatEUR(currentPrice)}
+                        </span>
+                        <span className="text-sm text-muted-foreground line-through">
+                          {formatEUR(oldPrice)}
+                        </span>
+                      </div>
+                    </CardContent>
 
-                  <CardFooter className="p-4 pt-0 flex gap-2">
-                    <Button
-                      asChild
-                      className="flex-1 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold"
-                    >
-                      <Link to={`/products/${product.slug}`}>Нарачај</Link>
-                    </Button>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                    >
-                      <Link to={`/products/${product.slug}`}>Повеќе инфо</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
+                    <CardFooter className="p-4 pt-0 flex gap-2">
+                      <Button
+                        asChild
+                        className="flex-1 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold"
+                      >
+                        <Link to={`/products/${product.slug}`}>Нарачај</Link>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      >
+                        <Link to={`/products/${product.slug}`}>Повеќе инфо</Link>
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </ScrollReveal>
               );
             })}
           </div>
@@ -159,7 +160,7 @@ export function FeaturedGrid() {
           </div>
         )}
 
-        <div className="text-center">
+        <ScrollReveal className="text-center">
           <Button
             asChild
             size="lg"
@@ -168,7 +169,7 @@ export function FeaturedGrid() {
           >
             <Link to="/products">Видете ги сите производи</Link>
           </Button>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

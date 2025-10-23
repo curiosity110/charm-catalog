@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { ContactBlock } from "@/components/site/ContactBlock";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,7 +13,7 @@ export default function ContactPage() {
       <Navbar />
       <main className="flex-1">
         <section className="py-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+          <ScrollReveal className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">
               Контактирајте го тимот на Vita Call
             </h1>
@@ -20,18 +21,19 @@ export default function ContactPage() {
               Имаме отворена комуникација со нашите клиенти. Пополнете ја
               формата и ќе ви одговориме во рок од 24 часа.
             </p>
-          </div>
+          </ScrollReveal>
         </section>
 
         <section className="py-8">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-8 md:grid-cols-[2fr,3fr]">
-            <Card className="border-border/60">
-              <CardContent className="p-6 space-y-4 text-left">
-                <h2 className="text-2xl font-semibold text-foreground">
-                  Работно време
-                </h2>
-                <p className="text-muted-foreground">
-                  Понеделник - Петок: 09:00 - 18:00
+            <ScrollReveal>
+              <Card className="border-border/60 h-full">
+                <CardContent className="p-6 space-y-4 text-left">
+                  <h2 className="text-2xl font-semibold text-foreground">
+                    Работно време
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Понеделник - Петок: 09:00 - 18:00
                   <br />
                   Сабота: 10:00 - 14:00
                 </p>
@@ -62,26 +64,28 @@ export default function ContactPage() {
                   <h3 className="text-lg font-semibold text-foreground">
                     Е-пошта
                   </h3>
-                  <p>
-                    <a
-                      href="mailto:info@naturalcharm.mk"
-                      className="text-primary hover:text-primary-light"
-                    >
-                      info@naturalcharm.mk
-                    </a>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                    <p>
+                      <a
+                        href="mailto:info@naturalcharm.mk"
+                        className="text-primary hover:text-primary-light"
+                      >
+                        info@naturalcharm.mk
+                      </a>
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
 
-            <Card className="border-border/60">
-              <CardContent className="p-6">
-                <form className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="contact-name"
-                        className="block text-sm font-medium text-foreground"
+            <ScrollReveal delay={160}>
+              <Card className="border-border/60">
+                <CardContent className="p-6">
+                  <form className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <label
+                          htmlFor="contact-name"
+                          className="block text-sm font-medium text-foreground"
                       >
                         Име и презиме
                       </label>
@@ -131,13 +135,14 @@ export default function ContactPage() {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-primary hover:bg-primary-light"
+                    className="w-full bg-primary hover:bg-primary-light transition-colors duration-300"
                   >
                     Испрати порака
                   </Button>
-                </form>
-              </CardContent>
-            </Card>
+                  </form>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
           </div>
         </section>
 
