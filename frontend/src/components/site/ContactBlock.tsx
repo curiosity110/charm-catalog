@@ -61,10 +61,10 @@ export function ContactBlock() {
               </h3>
               <p className="text-sm text-muted-foreground">
                 <a
-                  href="mailto:info@naturalcharm.mk"
+                  href="mailto:info@vitacall.mk"
                   className="hover:text-primary transition-colors"
                 >
-                  info@naturalcharm.mk
+                  info@vitacall.mk
                 </a>
               </p>
             </CardContent>
