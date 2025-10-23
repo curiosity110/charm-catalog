@@ -53,7 +53,7 @@ export default function ProductsPage() {
       return;
     }
 
-    toast({ 
+    toast({
       title: "Грешка",
       description:
         error.message || "Не можеме да ги вчитаме производите во моментов.",
@@ -63,7 +63,7 @@ export default function ProductsPage() {
 
   const handleAddToCart = (product: Product) => {
     addItem(product, 1);
-    toast({ 
+    toast({
       title: "Додадено во кошничка",
       description: `${product.title} е додаден во вашата кошничка.`,
     });
@@ -245,7 +245,7 @@ export default function ProductsPage() {
                       onClick={() => handleAddToCart(product)}
                     >
                       <ShoppingCart className="mr-2 h-4 w-4" />
-                      Во кошничка
+                      Нарачај
                     </Button>
 
                     <Button
