@@ -181,22 +181,6 @@ export default function ProductDetailPage() {
                   {product.description}
                 </p>
               )}
-
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <QuickOrderDialog
-                  product={product}
-                  trigger={
-                    <Button className="bg-primary hover:bg-primary-light">
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      Нарачај веднаш
-                    </Button>
-                  }
-                />
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Truck className="h-4 w-4" />
-                  <span>Брза достава и плаќање при прием.</span>
-                </div>
-              </div>
             </div>
 
             <Card>
@@ -221,15 +205,14 @@ export default function ProductDetailPage() {
                   trigger={
                     <Button className="w-full h-12 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold">
                       <ShoppingCart className="mr-2 h-4 w-4" />
-                      Отвори форма за нарачка
+                      Нарачај
                     </Button>
                   }
                 />
 
                 <p className="text-xs text-muted-foreground">
                   * Вашите податоци ги користиме само за да ја потврдиме
-                  нарачката. Можете да се предомислите при телефонската
-                  потврда.
+                  нарачката. Можете да се предомислите при телефонската потврда.
                 </p>
               </CardContent>
             </Card>
