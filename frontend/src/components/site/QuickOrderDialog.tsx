@@ -72,7 +72,8 @@ export function QuickOrderDialog({ product, trigger }: QuickOrderDialogProps) {
       toast({
         position: "center",
         title: "Недостасуваат податоци",
-        description: "Внесете име, презиме и телефон за да ја потврдите нарачката.",
+        description:
+          "Внесете име, презиме и телефон за да ја потврдите нарачката.",
         variant: "destructive",
       });
       return;
@@ -94,7 +95,8 @@ export function QuickOrderDialog({ product, trigger }: QuickOrderDialogProps) {
       toast({
         position: "center",
         title: "Нарачката е примена",
-        description: "Ќе ве контактираме наскоро за потврда на вашата нарачка.",
+        description:
+          "Ќе ве контактире наскоро Аѓент за потврда на вашата нарачка.",
       });
 
       setFormData(initialFormState);
@@ -211,7 +213,8 @@ export function QuickOrderDialog({ product, trigger }: QuickOrderDialogProps) {
               >
                 {submitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Испраќање...
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                    Испраќање...
                   </>
                 ) : (
                   "Потврди нарачка"
