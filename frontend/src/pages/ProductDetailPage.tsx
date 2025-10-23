@@ -2,37 +2,21 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ShoppingCart, Truck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useCart } from "@/contexts/CartContext";
-import {
-  fetchProductBySlug,
-  submitOrderRequest,
-  type Product,
-} from "@/lib/api";
+import { fetchProductBySlug, type Product } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
+import { QuickOrderDialog } from "@/components/site/QuickOrderDialog";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const { toast } = useToast();
-  const { addItem, openCart } = useCart();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    customerName: "",
-    customerPhone: "",
-    customerEmail: "",
-    customerAddress: "",
-    quantity: 1,
-    notes: "",
-  });
-  const [submitting, setSubmitting] = useState(false);
 
   const {
     data: product,
@@ -49,7 +33,8 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (!product) {
       if (!isLoading && !isFetching && slug && !error) {
-        toast({ position: "center",
+        toast({
+          position: "center",
           title: "Производот не е достапен",
           description: "Производот што го барате не постои или е неактивен.",
           variant: "destructive",
@@ -77,75 +62,14 @@ export default function ProductDetailPage() {
     }
 
     console.error("Error loading product:", error);
-    toast({ position: "center",
+    toast({
+      position: "center",
       title: "Грешка",
       description:
         error.message || "Не можеме да ги вчитаме деталите за овој производ.",
       variant: "destructive",
     });
   }, [error, toast]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!product) return;
-
-    if (formData.quantity < 1) {
-      setFormData((prev) => ({ ...prev, quantity: 1 }));
-    }
-
-    setSubmitting(true);
-    try {
-      await submitOrderRequest({
-        customerName: formData.customerName,
-        customerPhone: formData.customerPhone,
-        customerEmail: formData.customerEmail || undefined,
-        customerAddress: formData.customerAddress || undefined,
-        notes: formData.notes || undefined,
-        items: [
-          {
-            productId: product.id,
-            quantity: Math.max(1, formData.quantity),
-          },
-        ],
-      });
-
-      toast({ position: "center",
-        title: "Ќе ве контактире Аѓент за 15 минути",
-        description: "Ќе ве контактираме наскоро за потврда на нарачката.",
-      });
-
-      // Reset form
-      setFormData({
-        customerName: "",
-        customerPhone: "",
-        customerEmail: "",
-        customerAddress: "",
-        quantity: 1,
-        notes: "",
-      });
-    } catch (error: any) {
-      toast({ position: "center",
-        title: "Грешка",
-        description:
-          error?.message ||
-          "Се случи грешка при испраќање на нарачката. Обидете се повторно.",
-        variant: "destructive",
-      });
-      console.error("Error creating request:", error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleAddToCart = () => {
-    if (!product) return;
-    addItem(product, Math.max(1, formData.quantity));
-    toast({ position: "center",
-      title: "Додадено во кошничка",
-      description: `${product.title} е додаден во вашата кошничка.`,
-    });
-    openCart();
-  };
 
   if (isLoading) {
     return (
@@ -198,11 +122,15 @@ export default function ProductDetailPage() {
     );
   }
 
-  const images = product
-    ? ([product.primary_image_url, product.image, product.image_url].filter(
-        Boolean
-      ) as string[])
-    : [];
+  if (!product) {
+    return null;
+  }
+
+  const images = [
+    product.primary_image_url,
+    product.image,
+    product.image_url,
+  ].filter(Boolean) as string[];
   const primaryImage = selectedImage || images[0] || null;
 
   return (
@@ -218,7 +146,6 @@ export default function ProductDetailPage() {
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product image */}
           <div className="aspect-square rounded-lg overflow-hidden bg-transparent p-2 sm:p-4 md:p-6">
             {primaryImage ? (
               <img
@@ -236,7 +163,6 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          {/* Product info & form */}
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-4">
@@ -249,7 +175,6 @@ export default function ProductDetailPage() {
                 <span className="text-lg text-muted-foreground line-through">
                   {formatEUR(Number((product as any).original_price) || 4800)}
                 </span>
-                {/* <Badge variant="secondary">Природно</Badge> */}
               </div>
               {product.description && (
                 <p className="text-muted-foreground mb-6">
@@ -258,13 +183,15 @@ export default function ProductDetailPage() {
               )}
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <Button
-                  className="bg-primary hover:bg-primary-light"
-                  onClick={handleAddToCart}
-                >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Додади во кошничка
-                </Button>
+                <QuickOrderDialog
+                  product={product}
+                  trigger={
+                    <Button className="bg-primary hover:bg-primary-light">
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Нарачај веднаш
+                    </Button>
+                  }
+                />
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Truck className="h-4 w-4" />
                   <span>Брза достава и плаќање при прием.</span>
@@ -276,48 +203,34 @@ export default function ProductDetailPage() {
               <CardHeader>
                 <CardTitle>Нарачај сега - Плати при достава</CardTitle>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="order-name">Име и презиме *</Label>
-                    <Input
-                      id="order-name"
-                      placeholder="Пример: Ана Анастасова"
-                      value={formData.customerName}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          customerName: e.target.value,
-                        }))
-                      }
-                      required
-                    />
-                  </div>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Оставете ги вашите податоци во формата и нашиот тим ќе ве
+                  контактира за да ја потврди нарачката и да договори достава.
+                </p>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="order-phone">Телефон *</Label>
-                    <Input
-                      id="order-phone"
-                      placeholder="07X XXX XXX"
-                      value={formData.customerPhone}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          customerPhone: e.target.value,
-                        }))
-                      }
-                      required
-                    />
-                  </div>
+                <Badge
+                  variant="outline"
+                  className="w-fit border-primary text-primary bg-primary/5"
+                >
+                  Плаќање при достава
+                </Badge>
 
-                  <Button
-                    type="submit"
-                    className="w-full flex-1 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold"
-                    disabled={submitting}
-                  >
-                    {submitting ? "Се испраќа..." : "Нарачај сега"}
-                  </Button>
-                </form>
+                <QuickOrderDialog
+                  product={product}
+                  trigger={
+                    <Button className="w-full h-12 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold">
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Отвори форма за нарачка
+                    </Button>
+                  }
+                />
+
+                <p className="text-xs text-muted-foreground">
+                  * Вашите податоци ги користиме само за да ја потврдиме
+                  нарачката. Можете да се предомислите при телефонската
+                  потврда.
+                </p>
               </CardContent>
             </Card>
           </div>
