@@ -1,5 +1,5 @@
 import { useId, useMemo, useState, type ReactNode } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Minus, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,13 +10,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { submitOrderRequest } from "@/lib/api";
 import type { Product } from "@/lib/types";
-import { formatEUR } from "@/lib/utils";
 
 interface QuickOrderDialogProps {
   product: Product;
@@ -24,21 +22,21 @@ interface QuickOrderDialogProps {
 }
 
 interface FormState {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   phone: string;
+  quantity: number;
 }
 
 const initialFormState: FormState = {
-  firstName: "",
-  lastName: "",
+  fullName: "",
   phone: "",
+  quantity: 1,
 };
 
 export function QuickOrderDialog({ product, trigger }: QuickOrderDialogProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState(initialFormState);
+  const [formData, setFormData] = useState<FormState>(initialFormState);
   const [submitting, setSubmitting] = useState(false);
 
   const primaryImage = useMemo(() => {
@@ -46,34 +44,37 @@ export function QuickOrderDialog({ product, trigger }: QuickOrderDialogProps) {
       product.primary_image_url || product.image || product.image_url || null
     );
   }, [product]);
+
   const instanceId = useId();
-  const firstNameId = `${instanceId}-first-name`;
-  const lastNameId = `${instanceId}-last-name`;
+  const fullNameId = `${instanceId}-full-name`;
   const phoneId = `${instanceId}-phone`;
+  const qtyId = `${instanceId}-qty`;
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (submitting) {
-      return;
-    }
-    if (!nextOpen) {
-      setFormData(initialFormState);
-    }
+    if (submitting) return;
+    if (!nextOpen) setFormData(initialFormState);
     setOpen(nextOpen);
+  };
+
+  const formatPhone = (raw: string) => {
+    const digits = raw.replace(/\D/g, "").slice(0, 9); // 07x xxx xxx
+    return digits
+      .replace(/(\d{3})(\d)/, "$1 $2")
+      .replace(/(\d{3}) (\d{3})(\d)/, "$1 $2 $3");
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const firstName = formData.firstName.trim();
-    const lastName = formData.lastName.trim();
+    const fullName = formData.fullName.trim();
     const phone = formData.phone.trim();
+    const quantity = Math.max(1, formData.quantity | 0);
 
-    if (!firstName || !lastName || !phone) {
+    if (!fullName || !phone) {
       toast({
         position: "center",
         title: "Недостасуваат податоци",
-        description:
-          "Внесете име, презиме и телефон за да ја потврдите нарачката.",
+        description: "Внесете име и презиме и телефон за потврда.",
         variant: "destructive",
       });
       return;
@@ -82,21 +83,15 @@ export function QuickOrderDialog({ product, trigger }: QuickOrderDialogProps) {
     setSubmitting(true);
     try {
       await submitOrderRequest({
-        customerName: `${firstName} ${lastName}`.trim(),
+        customerName: fullName,
         customerPhone: phone,
-        items: [
-          {
-            productId: product.id,
-            quantity: 1,
-          },
-        ],
+        items: [{ productId: product.id, quantity }],
       });
 
       toast({
         position: "center",
         title: "Нарачката е примена",
-        description:
-          "Ќе ве контактире Аѓент наскоро, за потврда на вашата нарачка.",
+        description: "Агент ќе ве контактира наскоро.",
       });
 
       setFormData(initialFormState);
@@ -118,111 +113,168 @@ export function QuickOrderDialog({ product, trigger }: QuickOrderDialogProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Нарачај {product.title}</DialogTitle>
-          <DialogDescription>
-            Пополнете ги податоците за да ја потврдите нарачката. Ќе ве
-            контактираме телефонски за финални детали.
-          </DialogDescription>
-        </DialogHeader>
 
-        <ScrollArea className="max-h-[70vh] pr-4">
-          <div className="space-y-4 py-1">
-            <div className="flex items-center gap-4 rounded-lg border border-border/60 bg-muted/20 p-4">
+      <DialogContent
+        className="
+          max-w-[28rem] p-0 border border-border/50
+          bg-white text-foreground
+          rounded-2xl shadow-lg
+          /* minimal animation */
+          duration-200
+          data-[state=open]:animate-in
+          data-[state=closed]:animate-out
+          data-[state=open]:fade-in-0
+          data-[state=closed]:fade-out-0
+          data-[state=open]:zoom-in-95
+          data-[state=closed]:zoom-out-95
+          origin-center
+        "
+      >
+        <div className="p-6">
+          <DialogHeader className="items-center text-center space-y-2">
+            {/* Middle IMG */}
+            <div className="w-28 h-28 rounded-xl overflow-hidden border border-border/50 bg-white">
               {primaryImage ? (
-                <div className="relative h-16 w-16 overflow-hidden rounded-md bg-background">
-                  <img
-                    src={primaryImage}
-                    alt={product.title}
-                    className="absolute inset-0 h-full w-full object-contain"
-                  />
-                </div>
+                <img
+                  src={primaryImage}
+                  alt={product.title}
+                  className="h-full w-full object-contain"
+                />
               ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-md bg-background text-2xl">
-                  🌿
+                <div className="flex h-full w-full items-center justify-center text-3xl">
+                  🧴
                 </div>
               )}
+            </div>
 
-              <div className="min-w-0">
-                <p className="font-semibold text-foreground line-clamp-2">
-                  {product.title}
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {formatEUR(Number(product.price) || 0)}
-                </p>
+            {/* Title */}
+            <DialogTitle className="text-base font-semibold tracking-tight">
+              {product.title}
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Брза, едноставна нарачка
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+            {/* Quantity */}
+            <div className="grid gap-1.5">
+              <Label htmlFor={qtyId} className="text-xs text-muted-foreground">
+                Количина
+              </Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-9 w-9 rounded-lg"
+                  onClick={() =>
+                    setFormData((p) => ({
+                      ...p,
+                      quantity: Math.max(1, p.quantity - 1),
+                    }))
+                  }
+                  aria-label="Намали количина"
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <Input
+                  id={qtyId}
+                  inputMode="numeric"
+                  pattern="^[1-9]\d*$"
+                  value={String(formData.quantity)}
+                  onChange={(e) =>
+                    setFormData((p) => ({
+                      ...p,
+                      quantity: Math.max(
+                        1,
+                        parseInt(e.target.value || "1", 10) || 1
+                      ),
+                    }))
+                  }
+                  className="h-9 w-16 text-center rounded-lg"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-9 w-9 rounded-lg"
+                  onClick={() =>
+                    setFormData((p) => ({ ...p, quantity: p.quantity + 1 }))
+                  }
+                  aria-label="Зголеми количина"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div className="grid gap-2">
-                <Label htmlFor={firstNameId}>Име *</Label>
-                <Input
-                  id={firstNameId}
-                  autoComplete="given-name"
-                  placeholder="Пример: Ана"
-                  value={formData.firstName}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      firstName: event.target.value,
-                    }))
-                  }
-                  required
-                />
-              </div>
+            {/* Name & Surname together */}
+            <div className="grid gap-1.5">
+              <Label htmlFor={fullNameId}>Име и презиме *</Label>
+              <Input
+                id={fullNameId}
+                autoComplete="name"
+                placeholder="Пример: Ана Анастасова"
+                className="h-11 rounded-xl"
+                value={formData.fullName}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, fullName: e.target.value }))
+                }
+                required
+              />
+            </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor={lastNameId}>Презиме *</Label>
-                <Input
-                  id={lastNameId}
-                  autoComplete="family-name"
-                  placeholder="Пример: Анастасова"
-                  value={formData.lastName}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      lastName: event.target.value,
-                    }))
-                  }
-                  required
-                />
-              </div>
+            {/* Phone */}
+            <div className="grid gap-1.5">
+              <Label htmlFor={phoneId}>Телефон *</Label>
+              <Input
+                id={phoneId}
+                autoComplete="tel"
+                inputMode="numeric"
+                placeholder="07X XXX XXX"
+                className="h-11 rounded-xl"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData((p) => ({
+                    ...p,
+                    phone: formatPhone(e.target.value),
+                  }))
+                }
+                pattern="^0\d{2}\s\d{3}\s\d{3}$"
+                title="Внесете телефон во формат 07X XXX XXX"
+                required
+              />
+            </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor={phoneId}>Телефон *</Label>
-                <Input
-                  id={phoneId}
-                  autoComplete="tel"
-                  placeholder="07X XXX XXX"
-                  value={formData.phone}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      phone: event.target.value,
-                    }))
-                  }
-                  required
-                />
-              </div>
+            {/* Confirm Order */}
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="
+    w-full h-11 rounded-xl font-medium
+    bg-[#0065ff] text-white 
+    hover:bg-[#0055e0]
+    active:bg-[#0047c0]
+    transition-colors duration-200
+    disabled:opacity-60
+              "
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Испраќање…
+                </>
+              ) : (
+                "Потврди нарачка"
+              )}
+            </Button>
 
-              <Button
-                type="submit"
-                className="w-full h-12 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold"
-                disabled={submitting}
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
-                    Испраќање...
-                  </>
-                ) : (
-                  "Потврди нарачка"
-                )}
-              </Button>
-            </form>
-          </div>
-        </ScrollArea>
+            {/* Tiny legal line */}
+            <p className="text-[11px] text-muted-foreground text-center">
+              Нема онлајн плаќање. Ќе ве контактираме за потврда.
+            </p>
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
