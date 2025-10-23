@@ -116,43 +116,68 @@ export function CartSheet() {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="sm:max-w-lg flex flex-col">
-        <SheetHeader>
-          <SheetTitle>Ваша кошничка</SheetTitle>
-          <SheetDescription>
-            Плаќањето е при достава. Проверете ги артиклите и потврдете ја
-            нарачката.
-          </SheetDescription>
-        </SheetHeader>
 
-        <div className="flex-1 overflow-hidden py-4">
+      {/* Full-height sheet; inner layout is a column with min-h-0 to allow child scroll */}
+      <SheetContent
+        side="right"
+        className="
+          flex flex-col p-0
+          w-[95vw] sm:w-[440px] md:w-[580px] lg:w-[720px]
+          h-[100dvh] max-h-[100dvh]
+        "
+      >
+        {/* Header (compact) */}
+        <div className="border-b border-border/50 p-4 sm:p-5">
+          <SheetHeader className="space-y-1">
+            <SheetTitle className="text-xl md:text-2xl">
+              Ваша кошничка
+            </SheetTitle>
+            <SheetDescription className="hidden sm:block">
+              Плаќањето е при достава. Проверете ги артиклите и потврдете ја
+              нарачката.
+            </SheetDescription>
+          </SheetHeader>
+        </div>
+
+        {/* Body: make this the only scrollable area */}
+        <div className="flex-1 min-h-0">
           {items.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground gap-2">
+            <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground gap-2 p-6">
               <ShoppingCart className="h-10 w-10" />
               <p>
                 Вашата кошничка е празна. Додајте производи за да продолжите.
               </p>
             </div>
           ) : (
-            <ScrollArea className="h-full pr-4">
-              <div className="space-y-4">
+            <ScrollArea className="h-full">
+              <div className="p-4 sm:p-5 space-y-4 pr-2">
                 {items.map((item) => {
                   const primaryImage =
                     item.product.primary_image_url ||
                     item.product.image ||
                     item.product.image_url ||
                     null;
+
+                  const unitPrice = Number(item.product.price) || 0;
+                  const lineTotal = unitPrice * item.quantity;
+
                   return (
                     <div
                       key={item.product.id}
-                      className="flex gap-4 rounded-lg border border-border/50 p-4"
+                      className="
+                        grid gap-4 rounded-lg border border-border/50 p-4
+                        grid-cols-[84px,1fr,auto]
+                        md:grid-cols-[100px,minmax(0,1fr),auto]
+                        bg-card
+                      "
                     >
-                      <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-transparent">
+                      {/* Image (moderate size, clear) */}
+                      <div className="relative h-[84px] w-[84px] md:h-[100px] md:w-[100px] overflow-hidden rounded-md bg-white ring-1 ring-border">
                         {primaryImage ? (
                           <img
                             src={primaryImage}
                             alt={item.product.title}
-                            className="h-full w-full object-contain p-1"
+                            className="absolute inset-0 h-full w-full object-contain p-2"
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-2xl">
@@ -161,20 +186,23 @@ export function CartSheet() {
                         )}
                       </div>
 
-                      <div className="flex flex-1 flex-col gap-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-medium leading-tight text-foreground">
+                      {/* Title / unit price / qty */}
+                      <div className="min-w-0 flex flex-col justify-between">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-[15px] md:text-base font-medium leading-tight text-foreground break-words">
                               {item.product.title}
                             </p>
-                            <p className="text-sm text-muted-foreground">
-                              {formatEUR(Number(item.product.price) || 0)}
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {formatEUR(unitPrice)}{" "}
+                              <span className="opacity-70">/ ед.</span>
                             </p>
                           </div>
+
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
                             onClick={() => removeItem(item.product.id)}
                             aria-label="Отстрани"
                           >
@@ -182,41 +210,43 @@ export function CartSheet() {
                           </Button>
                         </div>
 
-                        <div className="flex items-center justify-between">
+                        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
                             <Button
                               variant="outline"
                               size="icon"
-                              className="h-8 w-8"
+                              className="h-9 w-9"
                               onClick={() =>
                                 handleQuantityChange(item.product.id, -1)
                               }
                               aria-label="Намали количина"
                             >
-                              <Minus className="h-3 w-3" />
+                              <Minus className="h-4 w-4" />
                             </Button>
-                            <span className="w-8 text-center text-sm font-medium">
+                            <span className="w-10 text-center text-sm md:text-base font-medium">
                               {item.quantity}
                             </span>
                             <Button
                               variant="outline"
                               size="icon"
-                              className="h-8 w-8"
+                              className="h-9 w-9"
                               onClick={() =>
                                 handleQuantityChange(item.product.id, 1)
                               }
                               aria-label="Зголеми количина"
                             >
-                              <Plus className="h-3 w-3" />
+                              <Plus className="h-4 w-4" />
                             </Button>
                           </div>
-                          <span className="text-sm font-semibold text-foreground">
-                            {formatEUR(
-                              (Number(item.product.price) || 0) * item.quantity
-                            )}
+
+                          <span className="text-sm md:text-base font-semibold text-foreground">
+                            {formatEUR(lineTotal)}
                           </span>
                         </div>
                       </div>
+
+                      {/* spacer for 3rd col alignment */}
+                      <div className="hidden md:block" />
                     </div>
                   );
                 })}
@@ -225,29 +255,31 @@ export function CartSheet() {
           )}
         </div>
 
+        {/* Footer: separated, not inside the scroller */}
         {items.length > 0 && (
-          <div className="border-t border-border/50 pt-4 space-y-4">
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="border-t border-border/50 p-4 sm:p-5">
+            <div className="flex items-center justify-between text-sm md:text-base text-muted-foreground">
               <span>Вкупно ({itemCount} артикли)</span>
-              <span className="text-lg font-semibold text-primary">
+              <span className="text-lg md:text-xl font-semibold text-primary">
                 {formatEUR(totalPrice)}
               </span>
             </div>
 
             <Badge
               variant="outline"
-              className="w-full justify-center border-primary text-primary bg-primary/5"
+              className="mt-3 w-full justify-center border-primary text-primary bg-primary/5"
             >
               Плати при достава
             </Badge>
 
-            <Separator />
+            <Separator className="my-4" />
 
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="grid gap-2">
                 <Label htmlFor="cart-name">Име и презиме *</Label>
                 <Input
                   id="cart-name"
+                  className="h-11"
                   placeholder="Пример: Ана Анастасова"
                   value={formData.customerName}
                   onChange={(event) =>
@@ -264,6 +296,7 @@ export function CartSheet() {
                 <Label htmlFor="cart-phone">Телефон *</Label>
                 <Input
                   id="cart-phone"
+                  className="h-11"
                   placeholder="07X XXX XXX"
                   value={formData.customerPhone}
                   onChange={(event) =>
@@ -276,58 +309,9 @@ export function CartSheet() {
                 />
               </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="cart-email">Е-пошта</Label>
-                <Input
-                  id="cart-email"
-                  type="email"
-                  placeholder="optional@example.com"
-                  value={formData.customerEmail}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      customerEmail: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="cart-address">Адреса за достава</Label>
-                <Input
-                  id="cart-address"
-                  placeholder="Ул. Пример бр. 1, Скопје"
-                  value={formData.customerAddress}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      customerAddress: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="cart-notes">Забелешка</Label>
-                <Textarea
-                  id="cart-notes"
-                  placeholder="Дополнителни информации за доставата"
-                  value={formData.notes}
-                  onChange={(event) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      notes: event.target.value,
-                    }))
-                  }
-                  rows={3}
-                />
-              </div>
-
               <Button
                 type="submit"
-                className="w-full
-               bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold
-              "
+                className="w-full h-12 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold"
                 disabled={submitting}
               >
                 {submitting ? "Испраќање..." : "Потврди нарачка"}
