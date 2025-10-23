@@ -128,3 +128,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Responsive helpers for 1000px breakpoint without changing Tailwind config */
+@media (min-width: 1000px) {
+  .show-desktop-1000 { display: flex !important; }
+  .hide-desktop-1000 { display: none !important; }
+}
+
+/* Hide native search clear so we can render our own consistent X */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+@media (max-width: 999.98px) {
+  .show-desktop-1000 { display: none !important; }
+  .hide-desktop-1000 { display: inline-flex !important; }
+}

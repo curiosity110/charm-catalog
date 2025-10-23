@@ -1,20 +1,20 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { CartSheet } from "./CartSheet";
 import { Input } from "@/components/ui/input";
-// import VitaCall-Logo from "@/assets/vita-call-logo.svg";
 import VitaCall_Logo from "@/assets/vita-call-logo.png";
 
 const navigation = [
-  { name: "ПОЧЕТНА", href: "/" },
-  { name: "ПРОИЗВОДИ", href: "/products" },
-  { name: "ЗА НАС", href: "/about" },
-  { name: "ПРАШАЊА И ОДГОВОРИ", href: "/faq" },
-  { name: "КОНТАКТ", href: "/contact" },
+  { name: "Почетна", href: "/" },
+  { name: "Производи", href: "/products" },
+  { name: "За нас", href: "/about" },
+  { name: "ЧПП", href: "/faq" },
+  { name: "Контакт", href: "/contact" },
 ];
 
 export function Navbar() {
@@ -57,27 +57,19 @@ export function Navbar() {
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2">
               <div className="text-2xl font-bold text-primary font-[var(--font-script)]">
-                <Link
-                  to="/"
-                  className="relative flex items-center justify-center group"
-                >
+                <Link to="/" className="relative flex items-center justify-center group">
                   <img
                     src={VitaCall_Logo}
                     alt="VitaCall Logo"
-                    className="
-      h-14 sm:h-14 w-auto object-contain
-      transition-transform duration-300 ease-out
-      group-hover:scale-110 
-      transform-gpu will-change-transform
-    "
+                    className="h-14 sm:h-14 w-auto object-contain transition-transform duration-300 ease-out group-hover:scale-110 transform-gpu will-change-transform"
                   />
                 </Link>
               </div>
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation (only from >=1000px width) */}
+          <nav className="hidden show-desktop-1000 items-center space-x-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
@@ -94,25 +86,32 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            <form
-              onSubmit={handleSearch}
-              className="hidden sm:flex items-center relative"
-            >
+            <form onSubmit={handleSearch} className="hidden sm:flex items-center relative">
               <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <Input
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 type="search"
-                placeholder="Пребарувај производи"
-                className="pl-9 w-56"
+                placeholder="Пребарај производи"
+                className="pl-9 pr-8 w-56"
               />
+              {searchTerm && (
+                <button
+                  type="button"
+                  aria-label="Clear search"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-2 inline-flex h-6 w-6 items-center justify-center rounded-md text-primary hover:text-primary-light focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </form>
 
             <CartSheet />
 
-            {/* Mobile menu */}
+            {/* Mobile menu (visible below 1000px) */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild className="md:hidden">
+              <SheetTrigger asChild className="hide-desktop-1000">
                 <Button variant="ghost" size="sm">
                   <Menu className="h-5 w-5" />
                 </Button>
@@ -125,9 +124,19 @@ export function Navbar() {
                       value={searchTerm}
                       onChange={(event) => setSearchTerm(event.target.value)}
                       type="search"
-                      placeholder="Пребарувај производи"
-                      className="pl-9"
+                      placeholder="Пребарај производи"
+                      className="pl-9 pr-9"
                     />
+                    {searchTerm && (
+                      <button
+                        type="button"
+                        aria-label="Clear search"
+                        onClick={() => setSearchTerm("")}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex h-7 w-7 items-center justify-center rounded-md text-primary hover:text-primary-light focus:outline-none focus:ring-2 focus:ring-ring"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
                   </div>
                 </form>
                 <div className="flex flex-col space-y-4 mt-8">

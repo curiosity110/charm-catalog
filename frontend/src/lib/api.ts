@@ -4,7 +4,8 @@ import type { Order, OrderItem, Product } from "@/lib/types";
 const DEFAULT_API_BASE_URL = "http://localhost:8000";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
 
-const MOCK_PRODUCT_SAMPLE_SIZE = 5;
+// Show all mock products by default (no random sampling)
+const MOCK_PRODUCT_SAMPLE_SIZE = Infinity;
 
 type RequestOptions = RequestInit & { signal?: AbortSignal };
 
@@ -39,12 +40,7 @@ function matchesSearch(product: Product, search?: string): boolean {
 
 function sampleMockProducts(search?: string): Product[] {
   const filtered = mockProducts.filter((product) => matchesSearch(product, search));
-  if (filtered.length <= MOCK_PRODUCT_SAMPLE_SIZE) {
-    return filtered;
-  }
-
-  const shuffled = [...filtered].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, MOCK_PRODUCT_SAMPLE_SIZE);
+  return filtered;
 }
 
 export async function fetchProducts(search?: string, signal?: AbortSignal): Promise<Product[]> {

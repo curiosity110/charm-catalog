@@ -8,7 +8,7 @@ import { fetchProducts, type Product } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
 import { mockProducts } from "@/assets/products/mockProducts";
 
-const FEATURED_COUNT = 3;
+const FEATURED_COUNT = Number((import.meta as any).env?.VITE_FEATURED_COUNT ?? 3) || 3;
 
 function selectFeaturedProducts(products: Product[]): Product[] {
   if (!products.length) {

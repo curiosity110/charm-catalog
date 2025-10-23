@@ -53,7 +53,7 @@ export default function ProductsPage() {
       return;
     }
 
-    toast({
+    toast({ 
       title: "Грешка",
       description:
         error.message || "Не можеме да ги вчитаме производите во моментов.",
@@ -63,7 +63,7 @@ export default function ProductsPage() {
 
   const handleAddToCart = (product: Product) => {
     addItem(product, 1);
-    toast({
+    toast({ 
       title: "Додадено во кошничка",
       description: `${product.title} е додаден во вашата кошничка.`,
     });
@@ -101,15 +101,15 @@ export default function ProductsPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Нашите производи
+            Производи
           </h1>
           <p className="text-lg text-muted-foreground">
             Откријте ги сите наши природни решенија за здравје и убавина
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-8 p-6 bg-muted/20 rounded-lg">
+        {/* Filters - hidden on mobile for simpler UX */}
+        <div className="hidden md:flex flex-col lg:flex-row gap-4 mb-8 p-6 bg-muted/20 rounded-lg">
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-full lg:w-48">
               <SelectValue placeholder="Сортирај по" />
