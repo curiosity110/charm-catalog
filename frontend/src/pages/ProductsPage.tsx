@@ -16,13 +16,12 @@ import {
 } from "@/components/ui/select";
 import { fetchProducts, type Product } from "@/lib/api";
 import { formatEUR } from "@/lib/utils";
-import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { QuickOrderDialog } from "@/components/site/QuickOrderDialog";
 
 export default function ProductsPage() {
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const { addItem, openCart } = useCart();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
 
@@ -60,15 +59,6 @@ export default function ProductsPage() {
       variant: "destructive",
     });
   }, [error, toast]);
-
-  const handleAddToCart = (product: Product) => {
-    addItem(product, 1);
-    toast({
-      title: "Додадено во кошничка",
-      description: `${product.title} е додаден во вашата кошничка.`,
-    });
-    openCart();
-  };
 
   const sortedProducts = useMemo(() => {
     return [...products].sort((a, b) => {
@@ -240,13 +230,15 @@ export default function ProductsPage() {
                   </CardContent>
 
                   <CardFooter className="p-4 pt-0 flex gap-2">
-                    <Button
-                      className="flex-1 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold"
-                      onClick={() => handleAddToCart(product)}
-                    >
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      Нарачај
-                    </Button>
+                    <QuickOrderDialog
+                      product={product}
+                      trigger={
+                        <Button className="flex-1 bg-[#0052cc] hover:bg-[#0065ff] text-white font-semibold">
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          Нарачај
+                        </Button>
+                      }
+                    />
 
                     <Button
                       asChild

@@ -5,7 +5,6 @@ import { Menu, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { CartSheet } from "./CartSheet";
 import { Input } from "@/components/ui/input";
 import VitaCall_Logo from "@/assets/vita-call-logo.png";
 
@@ -106,8 +105,6 @@ export function Navbar() {
                 </button>
               )}
             </form>
-
-            <CartSheet />
 
             {/* Mobile menu (visible below 1000px) */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
